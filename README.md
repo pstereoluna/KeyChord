@@ -1,8 +1,6 @@
 # KeyChord - Virtual Piano Application
 
-A professional-grade Java Swing application for playing, recording, and exporting piano music.
-
-![KeyChord](https://via.placeholder.com/800x500?text=KeyChord+Virtual+Piano) <!-- Placeholder for screenshot -->
+A Java Swing application for playing, recording, and exporting piano music.
 
 ## Features
 
@@ -10,7 +8,7 @@ A professional-grade Java Swing application for playing, recording, and exportin
 - **25-key piano keyboard** (C3 to C5 range)
 - **Realistic proportions** with white and black keys
 - **Visual key highlighting** when pressed
-- **Mouse and keyboard support** for playing notes
+- **Mouse support** for playing notes
 
 ### 🎵 Chord Generation
 - **8 chord types**: Major, Minor, Diminished, Augmented, Major 7th, Minor 7th, Sus2, Sus4
@@ -19,7 +17,7 @@ A professional-grade Java Swing application for playing, recording, and exportin
 - **Polyphonic playback** (multiple simultaneous notes)
 
 ### 🎙️ Recording System
-- **One-click recording** (Space to start, Enter to stop)
+- **One-click recording**
 - **Auto-save** with default names
 - **Named recordings** stored in memory
 - **Chord recording** support (multiple notes with same timestamp)
@@ -68,14 +66,12 @@ java -jar target/KeyChord-1.0-SNAPSHOT.jar
 ## How to Use
 
 ### Playing Notes
-- **White keys**: `a`, `s`, `d`, `f`, `g`, `h`, `j`, `k`, `l`, `;`, `'`
-- **Black keys**: `w`, `e`, `t`, `y`, `u`, `o`, `p`
 - **Mouse**: Click on keys to play
 
 ### Recording
-1. Press **Space** or click **Record** button to start recording
+1. Click **Record** button to start recording
 2. Play notes/chords
-3. Press **Enter** or click **Record** again to stop
+3. Click **Record** again to stop
 4. Recording is auto-saved with default name
 
 ### Playing Recordings
@@ -124,15 +120,6 @@ KeyChord follows the **MVC (Model-View-Controller)** architectural pattern:
 - **PlaybackController**: Playback control
 - **RecordingPanelController**: Recording panel interactions
 
-## Keyboard Mapping
-
-```
-White Keys:  a  s  d  f  g  h  j  k  l  ;  '
-             C  D  E  F  G  A  B  C  D  E  F
-
-Black Keys:  w  e     t  y  u     o  p
-             C# D#    F# G# A#    C# D#
-```
 
 ## Project Structure
 
@@ -195,7 +182,7 @@ Contributions are welcome! Please:
 
 ## Credits
 
-Developed as a professional Java Swing application demonstrating:
+Developed as a Java Swing application demonstrating:
 - MVC architecture
 - MIDI audio programming
 - Thread-safe design
