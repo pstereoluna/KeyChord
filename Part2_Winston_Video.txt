@@ -1,0 +1,114 @@
+PART 2: WINSTON VIDEO - "How to Speak"
+========================================
+
+Five examples of Winston's advice that I plan to follow in presenting my Final Project:
+
+1. START WITH A CYCLE (The "Promise" Technique)
+-------------------------------------------------
+Winston emphasizes starting presentations with a promise of what the audience 
+will learn, then delivering on that promise, and finally summarizing what was 
+learned.
+
+MY APPLICATION:
+I will start my presentation by promising: "By the end of this presentation, 
+you will understand how KeyChord demonstrates professional MVC architecture, 
+SOLID principles, and comprehensive testing in a real-world Java application."
+
+Then I will deliver on this promise by walking through the architecture, 
+demonstrating each principle with code examples, and showing test coverage.
+
+Finally, I will summarize: "We've seen how KeyChord uses MVC separation, 
+SOLID principles, and design patterns to create maintainable, testable code."
+
+
+2. USE TIME AND PLACE TO BUILD A FENCE (Distinguish Your Work)
+----------------------------------------------------------------
+Winston advises using "time and place" to distinguish your work from others' 
+work - building a "fence" around your contribution.
+
+MY APPLICATION:
+I will clearly distinguish KeyChord's approach:
+- "Unlike simple piano apps that mix UI and logic, KeyChord strictly separates 
+  Model, View, and Controller with zero dependencies between layers."
+- "While many projects use fixed track systems, KeyChord uses a flexible 
+  RecordingManager that can handle unlimited named recordings."
+- "KeyChord demonstrates advanced OOD principles not just in structure, but 
+  in practical application - every design decision serves a purpose."
+
+
+3. USE PROPS AND DEMONSTRATIONS (Show, Don't Just Tell)
+--------------------------------------------------------
+Winston emphasizes the power of props and live demonstrations to engage the 
+audience and make concepts concrete.
+
+MY APPLICATION:
+I will:
+- Live-demo the application: play notes, record, play back, export MIDI
+- Show the keyboard highlighting during playback to demonstrate visual 
+  synchronization
+- Display the code structure in IDE to show MVC separation
+- Run unit tests live to demonstrate test coverage
+- Show the class diagram while explaining relationships
+
+This makes abstract OOD principles concrete and memorable.
+
+
+4. TELL A STORY (Narrative Structure)
+--------------------------------------
+Winston recommends using narrative structure - setting up a problem, showing 
+the journey to solve it, and revealing the solution.
+
+MY APPLICATION:
+I will structure my presentation as a story:
+- "The Challenge: Building a piano app that's both functional and well-designed"
+- "The Journey: How we applied MVC to separate concerns, SOLID principles to 
+  ensure maintainability, and design patterns to solve specific problems"
+- "The Solution: KeyChord - a professional application demonstrating all these 
+  principles working together"
+- "The Result: Clean, testable, extensible code that can grow with new features"
+
+This narrative structure makes the presentation engaging and memorable.
+
+
+5. USE THE BOARD EFFECTIVELY (Visual Communication)
+----------------------------------------------------
+Winston emphasizes using visual aids (board, slides) to reinforce verbal 
+communication, not replace it.
+
+MY APPLICATION:
+I will use slides/board to:
+- Show the MVC architecture diagram while explaining separation of concerns
+- Display code snippets highlighting specific OOD principles (e.g., "Here's 
+  how we use the Strategy pattern in ChordManager")
+- Show the class diagram while explaining relationships
+- Display test coverage metrics while discussing testing strategy
+- Use color coding to highlight different layers (Model=blue, View=green, 
+  Controller=yellow)
+
+Each visual will reinforce what I'm saying verbally, not just repeat it.
+
+
+BONUS: Additional Winston Principles I Will Apply
+---------------------------------------------------
+
+6. SPEAK WITH ENTHUSIASM
+I will demonstrate genuine enthusiasm for the project - showing how OOD 
+principles solve real problems and make code better.
+
+7. HANDLE QUESTIONS GRACEFULLY
+I will prepare for common questions (e.g., "Why MVC?", "Why not use inheritance 
+here?") and answer them by referring back to OOD principles.
+
+8. PRACTICE TIMING
+I will practice the presentation to ensure I stay within time limits while 
+covering all key points.
+
+9. USE EXAMPLES, NOT JUST ABSTRACTIONS
+I will show concrete code examples for each OOD principle, not just describe 
+them abstractly.
+
+10. END WITH A STRONG CONCLUSION
+I will end by summarizing the key OOD principles demonstrated and how they 
+make KeyChord a professional, maintainable application.
+
+

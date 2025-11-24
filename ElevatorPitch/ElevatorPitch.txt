@@ -1,0 +1,34 @@
+🎹 Final Project: Virtual Piano Studio / KeyChord
+
+Team Members:
+Jiaxin Jia, Xiaoyuan Lu
+
+Elevator Pitch
+
+Virtual Piano Studio — also known as KeyChord — is a lightweight Java-based music application that transforms any computer keyboard into a powerful, multi-track music sampler.
+We designed it for aspiring musicians, bedroom producers, and hobbyists who want to sketch musical ideas instantly, without needing expensive MIDI controllers or complex software.
+
+Unlike standard virtual pianos that only play single notes, our system lets users trigger full chords and harmonies with one click, turning simple keystrokes into expressive performances.
+KeyChord allows you to layer melodies, create loops, and build entire song drafts using only your QWERTY keyboard.
+
+Our goal is to make music creation more accessible and intuitive — turning everyday inspiration into a complete composition within seconds. 
+Beyond piano, we plan to incorporate more instruments, so users can create their own instant band and compose freely.
+
+Rough Draft: Domain Objects / Class Ideas
+
+Note – represents a single musical pitch
+Chord – defines groups of notes that form a harmony
+ChordFactory – creates chords (Major, Minor, 7th, etc.)
+MidiService – manages playback and timing
+KeyMapper – maps QWERTY keys to specific notes/chords
+Track – represents a loop layer for multi-track composition
+RecordingManager – records and replays performances
+VirtualPianoUI – GUI for visual keyboard and chord triggering
+
+Optional Future Extensions
+
+Multi-instrument support (guitar, bass, drums)
+User-defined chord progressions
+MIDI file export
+Real-time recording and playback visualization
+Practice mode with feedback

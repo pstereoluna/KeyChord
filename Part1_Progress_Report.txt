@@ -1,0 +1,279 @@
+PROGRESS REPORT - KeyChord Virtual Piano Project
+==================================================
+
+(a) Brief, updated summary of what the project will do
+------------------------------------------------------
+KeyChord is a professional-grade Java Swing application that provides an 
+interactive virtual piano with advanced recording and playback capabilities. 
+The application allows users to:
+
+- Play piano notes using computer keyboard (QWERTY mapping) or mouse clicks
+- Generate and play chords automatically (8 chord types: Major, Minor, 
+  Diminished, Augmented, Major 7th, Minor 7th, Sus2, Sus4)
+- Record musical performances with timestamps
+- Play back recordings with visual key synchronization
+- Manage multiple recordings (save, rename, delete, export to MIDI files)
+- Export recordings as standard MIDI (.mid) files
+
+The project demonstrates strict MVC architecture, SOLID principles, and 
+comprehensive unit testing using JUnit 5 and Mockito.
+
+
+(b) Which aspects of OOD will be evident in your solution and presentation
+--------------------------------------------------------------------------
+The following Object-Oriented Design principles are evident throughout:
+
+1. **MVC Architecture**: Strict separation of Model (business logic), View 
+   (Swing UI), and Controller (event handling and coordination)
+
+2. **SOLID Principles**:
+   - Single Responsibility: Each class has one clear purpose (e.g., ChordManager 
+     only generates chords, Recorder only handles recording timestamps)
+   - Open/Closed: ChordManager uses enum-based strategy pattern for extensible 
+     chord types
+   - Liskov Substitution: Player.EventSource interface allows Recording and 
+     Track to be used interchangeably
+   - Interface Segregation: KeyPressHandler interface provides minimal, focused 
+     contract
+   - Dependency Inversion: Controllers depend on Model interfaces, not concrete 
+     implementations
+
+3. **Design Patterns**:
+   - Singleton: MidiSoundManager ensures single synthesizer instance
+   - Strategy: ChordType enum for different chord generation algorithms
+   - Adapter: RecordingEventSource adapts Recording to Player.EventSource
+   - Observer: KeyListener and ActionListener for event-driven architecture
+
+4. **Abstraction**: Interfaces (EventSource, NotePlaybackHandler, KeyPressHandler) 
+   hide implementation details
+
+5. **Encapsulation**: All model classes use private fields with controlled access 
+   through methods
+
+6. **Delegation over Inheritance**: Controllers delegate to model methods rather 
+   than extending view components
+
+7. **Composition**: PianoModel composes multiple managers (RecordingManager, 
+   ChordManager, etc.) rather than inheriting functionality
+
+
+(c) Which member(s) of the instructional team have you spoken with about this version?
+--------------------------------------------------------------------------------------
+[TO BE FILLED: List the TA(s) and/or Professor Mark you spoke with during 
+recitation. Example: "Spoke with TA [Name] and Professor Mark during recitation 
+on [date]."]
+
+
+(d) Whether or not the instructor/TA indicated that the project seems feasible 
+    (not overly ambitious) and aligned with CS5004 objectives
+-------------------------------------------------------------------------------
+[TO BE FILLED: Example: "Yes, both TA and Professor Mark confirmed that the 
+project scope is appropriate - it demonstrates MVC, OOD principles, and 
+comprehensive testing without being overly complex. The MIDI audio component 
+adds technical depth while remaining feasible."]
+
+
+(e) Rough sketch of a Class Diagram
+-----------------------------------
+Major classes and their relationships:
+
+MODEL LAYER (Business Logic):
+- PianoModel (concrete class)
+  - Uses: Recorder, Player, MidiSoundManager, ChordManager, RecordingManager
+  
+- ChordManager (concrete class)
+  - Contains: ChordType (enum with intervals)
+  
+- RecordingManager (concrete class)
+  - Manages: Recording (concrete class)
+  
+- Recording (concrete class)
+  - Contains: List<NoteEvent>
+  
+- NoteEvent (concrete class, immutable data class)
+  
+- Recorder (concrete class)
+  - Creates: NoteEvent objects
+  
+- Player (concrete class)
+  - Uses: EventSource (interface)
+  - Uses: NotePlaybackHandler (interface)
+  
+- Track (concrete class)
+  - Implements: EventSource (interface)
+  
+- MidiSoundManager (concrete class, singleton)
+  
+- KeyMappings (utility class, static methods)
+
+VIEW LAYER (Swing UI):
+- MainWindow (extends JFrame)
+  - Contains: PianoView
+  
+- PianoView (extends JPanel)
+  - Contains: PianoKeyboardPanel, ControlPanelView, RecordingPanel
+  
+- PianoKeyboardPanel (extends JPanel)
+  - Contains: Map<Integer, PianoKeyView>
+  - Uses: KeyPressHandler (interface)
+  
+- PianoKeyView (extends JButton)
+  
+- ControlPanelView (extends JPanel)
+  
+- RecordingPanel (extends JPanel)
+
+CONTROLLER LAYER:
+- PianoController (implements KeyListener, ActionListener)
+  - Coordinates: PianoModel, PianoView
+  
+- RecordingController (implements KeyListener, ActionListener)
+  - Coordinates: PianoModel, PianoView
+  
+- PlaybackController (implements KeyListener, ActionListener)
+  - Coordinates: PianoModel, PianoView
+  
+- RecordingPanelController (implements ActionListener)
+  - Coordinates: PianoModel, PianoView
+
+INTERFACES:
+- Player.EventSource (interface)
+  - Implemented by: Track, Recording (via adapter)
+  
+- Player.NotePlaybackHandler (interface)
+  
+- PianoKeyboardPanel.KeyPressHandler (interface)
+
+ENTRY POINT:
+- KeyChordApp (main class)
+
+
+(f) The final list of Team Members working with you on the project
+------------------------------------------------------------------
+[TO BE FILLED: If solo: "Solo project - no team members"
+If team: List all team member names]
+
+
+(g) Roughly how many lines of Java code do you anticipate in your final submission?
+-----------------------------------------------------------------------------------
+Based on current implementation:
+- Source code: Approximately 3,350 lines
+- Test code: Approximately 1,500 lines
+- Total: Approximately 4,850 lines
+
+Rounded to nearest 50: **4,850 lines**
+
+
+(h) How many distinct files do you think will be involved, not counting presentation materials?
+----------------------------------------------------------------------------------------------
+Source files:
+- Model classes: 10 files
+- View classes: 6 files
+- Controller classes: 4 files
+- Entry point: 1 file
+Total source: **21 Java files**
+
+Test files:
+- Model tests: 10 files
+- View tests: 3 files
+- Controller tests: 4 files
+Total tests: **17 Java test files**
+
+Configuration:
+- pom.xml: 1 file
+
+Total: **39 files** (21 source + 17 test + 1 config)
+
+
+(i) How many lines of non-Java code, if any, do you anticipate being required?
+------------------------------------------------------------------------------
+Non-Java code:
+- pom.xml (Maven configuration): ~60 lines
+- README.md (documentation): ~200 lines
+- PROJECT_ANALYSIS.md (analysis): ~900 lines
+
+Total: Approximately **1,160 lines** of non-Java code (mostly documentation)
+
+
+(j) If you plan to avail of the allowed "up to 20%" AI-generated code, what will it be for?
+------------------------------------------------------------------------------------------
+[TO BE FILLED: Be honest about AI usage. Example options:]
+
+Option 1 (if using AI):
+"I plan to use AI assistance (approximately 15% of codebase, ~500 lines) for:
+- Initial project structure setup and boilerplate code
+- JUnit test templates and mock setup code
+- JavaDoc comment generation for standard getter/setter methods
+- Maven pom.xml dependency configuration
+
+All AI-generated code will be reviewed, tested, and understood before 
+submission. Core business logic (chord generation, recording, playback) 
+will be written manually."
+
+Option 2 (if not using AI):
+"I do not plan to use AI-generated code for this project. All code will 
+be written manually to ensure full understanding and proper OOD principles."
+
+
+(k) Focus on highlighting your use of OOD principles
+---------------------------------------------------
+In addition to "testable" and "tested" code, and Javadocs for every file 
+and method, the following OOD principles are visible in the code:
+
+1. **Abstraction**: 
+   - EventSource interface abstracts the source of NoteEvents (Recording, Track)
+   - NotePlaybackHandler interface abstracts playback behavior
+   - KeyPressHandler interface abstracts key input handling
+
+2. **Single Responsibility Principle (SOLID)**:
+   - ChordManager: Only generates chords, no audio or UI logic
+   - Recorder: Only manages recording timestamps, no playback logic
+   - MidiSoundManager: Only handles MIDI audio, no recording/playback logic
+   - Each controller handles one specific aspect (piano input, recording, playback)
+
+3. **Open/Closed Principle (SOLID)**:
+   - ChordManager can be extended with new ChordType enum values without 
+     modifying existing code
+   - Player can accept any EventSource implementation without modification
+
+4. **Liskov Substitution Principle (SOLID)**:
+   - Recording and Track both implement EventSource and can be used 
+     interchangeably in Player
+
+5. **Interface Segregation Principle (SOLID)**:
+   - KeyPressHandler has minimal interface (only onKeyPressed/onKeyReleased)
+   - NotePlaybackHandler separates note-on and note-off concerns
+
+6. **Dependency Inversion Principle (SOLID)**:
+   - Controllers depend on PianoModel interface, not concrete implementations
+   - Player depends on EventSource interface, not concrete Recording/Track
+
+7. **Delegation over Inheritance**:
+   - Controllers delegate to model methods rather than extending view components
+   - PianoModel delegates to specialized managers (RecordingManager, ChordManager)
+
+8. **Composition over Inheritance**:
+   - PianoModel composes multiple managers rather than inheriting functionality
+   - PianoView composes multiple panels (keyboard, control, recording)
+
+9. **Encapsulation**:
+   - All model classes use private fields with controlled access
+   - Thread-safe synchronization in Recording, RecordingManager, Recorder
+
+10. **Separation of Concerns**:
+    - Model has zero Swing dependencies (pure business logic)
+    - View has zero business logic (pure UI)
+    - Controllers mediate without containing business logic
+
+11. **Polymorphism**:
+    - ChordType enum provides polymorphic chord generation
+    - EventSource interface enables polymorphic playback
+
+12. **DRY (Don't Repeat Yourself)**:
+    - Common logic extracted to helper methods
+    - Reusable interfaces reduce code duplication
+
+These principles ensure the code is robust, extensible, maintainable, and 
+testable with minimal redundant coding.
+
+
