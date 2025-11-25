@@ -118,10 +118,9 @@
 
 1. **Recording.setName()** - Method exists but doesn't work (name is final)
 2. **Player.playEvents()** - Has duplicate empty check (lines 115-126)
-3. **Track class** - Still exists but not used in main flow (legacy from Track 1-9 system)
-4. **ControlPanelView** - Play button text says "Play (Enter)" but should say "Play Selected"
-5. **PianoController** - Chord mode changes don't affect currently playing notes
-6. **RecordingManager** - No persistence (recordings lost on app restart)
+3. **ControlPanelView** - Play button text says "Play (Enter)" but should say "Play Selected"
+4. **PianoController** - Chord mode changes don't affect currently playing notes
+5. **RecordingManager** - No persistence (recordings lost on app restart)
 
 ---
 

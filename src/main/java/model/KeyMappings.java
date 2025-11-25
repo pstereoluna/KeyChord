@@ -17,27 +17,41 @@ public class KeyMappings {
     private static final Map<Character, Integer> KEY_TO_OFFSET = new HashMap<>();
     
     static {
-        // White keys (lowercase)
-        KEY_TO_OFFSET.put('a', -9);  // C
-        KEY_TO_OFFSET.put('s', -7);  // D
-        KEY_TO_OFFSET.put('d', -5);  // E
-        KEY_TO_OFFSET.put('f', -4);  // F
-        KEY_TO_OFFSET.put('g', -2);  // G
-        KEY_TO_OFFSET.put('h', 0);   // A (middle C area)
-        KEY_TO_OFFSET.put('j', 2);   // B
-        KEY_TO_OFFSET.put('k', 3);   // C
-        KEY_TO_OFFSET.put('l', 5);   // D
-        KEY_TO_OFFSET.put(';', 7);   // E
-        KEY_TO_OFFSET.put('\'', 8);  // F
-        
-        // Black keys (uppercase for sharps)
-        KEY_TO_OFFSET.put('w', -8);  // C#
-        KEY_TO_OFFSET.put('e', -6);  // D#
-        KEY_TO_OFFSET.put('t', -3);  // F#
-        KEY_TO_OFFSET.put('y', -1);  // G#
-        KEY_TO_OFFSET.put('u', 1);   // A#
-        KEY_TO_OFFSET.put('o', 4);   // C#
-        KEY_TO_OFFSET.put('p', 6);   // D#
+
+        // White keys (Lower Octave Starts at C3, Offset -12)
+        KEY_TO_OFFSET.put('q', -12); // C3
+        KEY_TO_OFFSET.put('w', -10); // D3
+        KEY_TO_OFFSET.put('e', -8);  // E3
+        KEY_TO_OFFSET.put('r', -7);  // F3
+        KEY_TO_OFFSET.put('t', -5);  // G3
+        KEY_TO_OFFSET.put('y', -3);  // A3
+        KEY_TO_OFFSET.put('u', -1);  // B3
+        KEY_TO_OFFSET.put('i', 0);   // C4 (Middle C)
+
+        // Black keys
+        KEY_TO_OFFSET.put('2', -11); // C#3
+        KEY_TO_OFFSET.put('3', -9);  // D#3
+        KEY_TO_OFFSET.put('5', -6);  // F#3
+        KEY_TO_OFFSET.put('6', -4);  // G#3
+        KEY_TO_OFFSET.put('7', -2);  // A#3
+
+        // White keys (Upper Octave Starts at C4/Middle C, Offset 0)
+        KEY_TO_OFFSET.put('c', 0);   // C4 (Middle C)
+        KEY_TO_OFFSET.put('v', 2);   // D4
+        KEY_TO_OFFSET.put('b', 4);   // E4
+        KEY_TO_OFFSET.put('n', 5);   // F4
+        KEY_TO_OFFSET.put('m', 7);   // G4
+        KEY_TO_OFFSET.put(',', 9);   // A4
+        KEY_TO_OFFSET.put('.', 11);  // B4
+        KEY_TO_OFFSET.put('/', 12);  // C5
+
+        // Black keys
+        KEY_TO_OFFSET.put('f', 1);   // C#4
+        KEY_TO_OFFSET.put('g', 3);   // D#4
+        KEY_TO_OFFSET.put('j', 6);   // F#4
+        KEY_TO_OFFSET.put('k', 8);   // G#4
+        KEY_TO_OFFSET.put('l', 10);  // A#4
+
     }
     
     /**

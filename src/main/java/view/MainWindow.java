@@ -49,7 +49,7 @@ public class MainWindow extends JFrame {
         
         // Set minimum size to ensure both panels are fully visible
         // Height = keyboard panel (250) + control panel (100) + frame decorations (~40)
-        setMinimumSize(new Dimension(650, 390));
+        setMinimumSize(new Dimension(650, 340));
         
         // Center the window on screen
         setLocationRelativeTo(null);

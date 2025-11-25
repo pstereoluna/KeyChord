@@ -126,7 +126,7 @@ public class PianoKeyboardPanel extends JPanel {
         calculatedWidth = whiteKeyCount * WHITE_KEY_WIDTH;
         // Fixed height to prevent taking too much vertical space
         // Height = white key height + small padding for black keys
-        calculatedHeight = 250; // Fixed preferred height
+        calculatedHeight = 200; // Fixed preferred height
         
         Dimension size = new Dimension(calculatedWidth, calculatedHeight);
         setPreferredSize(size);

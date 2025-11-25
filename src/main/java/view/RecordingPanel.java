@@ -33,7 +33,7 @@ public class RecordingPanel extends JPanel {
         listModel = new DefaultListModel<>();
         recordingList = new JList<>(listModel);
         recordingList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        recordingList.setVisibleRowCount(10);
+        recordingList.setVisibleRowCount(5);
         
         scrollPane = new JScrollPane(recordingList);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -57,8 +57,8 @@ public class RecordingPanel extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
         
         // Set preferred size
-        setPreferredSize(new Dimension(200, 400));
-        setMinimumSize(new Dimension(180, 300));
+        setPreferredSize(new Dimension(200, 200));
+        setMinimumSize(new Dimension(180, 200));
     }
     
     /**

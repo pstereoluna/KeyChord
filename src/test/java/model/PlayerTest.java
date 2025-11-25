@@ -14,147 +14,161 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 class PlayerTest {
     private Player player;
-    private Track track;
-    
+    private TestEventSource testSource;
+
+    // A simple implementation of EventSource for testing purposes
+    // Replaces the legacy Track class
+    private static class TestEventSource implements Player.EventSource {
+        private final List<NoteEvent> events = new ArrayList<>();
+
+        @Override
+        public List<NoteEvent> getEvents() {
+            return events;
+        }
+
+        public void addNoteEvent(NoteEvent event) {
+            events.add(event);
+        }
+    }
+
     @BeforeEach
     void setUp() {
         player = new Player();
-        track = new Track(1);
+        testSource = new TestEventSource();
     }
-    
+
     @Test
     void testInitialState() {
         assertFalse(player.isPlaying(), "Should not be playing initially");
     }
-    
+
     @Test
-    void testStartPlaybackWithNullTrack() {
+    void testStartPlaybackWithNullSource() {
         assertThrows(IllegalArgumentException.class, () -> {
             player.startPlayback(null, new TestHandler());
-        }, "Should throw exception for null track");
+        }, "Should throw exception for null source");
     }
-    
+
     @Test
     void testStartPlaybackWithNullHandler() {
         assertThrows(IllegalArgumentException.class, () -> {
-            player.startPlayback(track, null);
+            player.startPlayback(testSource, null);
         }, "Should throw exception for null handler");
     }
-    
+
     @Test
     void testPlaybackOrderOfEvents() throws InterruptedException {
         // Add events with different timestamps
-        track.addNoteEvent(new NoteEvent(60, 0, true));
-        track.addNoteEvent(new NoteEvent(64, 100, true));
-        track.addNoteEvent(new NoteEvent(67, 200, true));
-        
+        testSource.addNoteEvent(new NoteEvent(60, 0, true));
+        testSource.addNoteEvent(new NoteEvent(64, 100, true));
+        testSource.addNoteEvent(new NoteEvent(67, 200, true));
+
         List<Integer> playedNotes = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(3);
-        
-        player.startPlayback(track, new Player.NotePlaybackHandler() {
+
+        player.startPlayback(testSource, new Player.NotePlaybackHandler() {
             @Override
             public void onNoteOn(int midiNote) {
                 playedNotes.add(midiNote);
                 latch.countDown();
             }
-            
+
             @Override
             public void onNoteOff(int midiNote) {
                 // Not used in this test
             }
         });
-        
+
         assertTrue(latch.await(2, TimeUnit.SECONDS), "All events should be played");
         assertEquals(3, playedNotes.size(), "Should play 3 notes");
         assertEquals(60, playedNotes.get(0), "First note should be 60");
         assertEquals(64, playedNotes.get(1), "Second note should be 64");
         assertEquals(67, playedNotes.get(2), "Third note should be 67");
     }
-    
+
     @Test
     void testMultiNotePlaybackSequences() throws InterruptedException {
         // Add note on and note off events
-        track.addNoteEvent(new NoteEvent(60, 0, true));
-        track.addNoteEvent(new NoteEvent(60, 100, false));
-        track.addNoteEvent(new NoteEvent(64, 200, true));
-        
+        testSource.addNoteEvent(new NoteEvent(60, 0, true));
+        testSource.addNoteEvent(new NoteEvent(60, 100, false));
+        testSource.addNoteEvent(new NoteEvent(64, 200, true));
+
         List<String> events = new ArrayList<>();
         CountDownLatch latch = new CountDownLatch(3);
-        
-        player.startPlayback(track, new Player.NotePlaybackHandler() {
+
+        player.startPlayback(testSource, new Player.NotePlaybackHandler() {
             @Override
             public void onNoteOn(int midiNote) {
                 events.add("ON:" + midiNote);
                 latch.countDown();
             }
-            
+
             @Override
             public void onNoteOff(int midiNote) {
                 events.add("OFF:" + midiNote);
                 latch.countDown();
             }
         });
-        
+
         assertTrue(latch.await(2, TimeUnit.SECONDS), "All events should be played");
         assertEquals(3, events.size(), "Should have 3 events");
         assertTrue(events.contains("ON:60"), "Should contain note on 60");
         assertTrue(events.contains("OFF:60"), "Should contain note off 60");
         assertTrue(events.contains("ON:64"), "Should contain note on 64");
     }
-    
+
     @Test
     void testStopPlayback() throws InterruptedException {
         // Add many events
         for (int i = 0; i < 10; i++) {
-            track.addNoteEvent(new NoteEvent(60 + i, i * 50, true));
+            testSource.addNoteEvent(new NoteEvent(60 + i, i * 50, true));
         }
-        
+
         List<Integer> playedNotes = new ArrayList<>();
-        
-        player.startPlayback(track, new Player.NotePlaybackHandler() {
+
+        player.startPlayback(testSource, new Player.NotePlaybackHandler() {
             @Override
             public void onNoteOn(int midiNote) {
                 playedNotes.add(midiNote);
             }
-            
+
             @Override
             public void onNoteOff(int midiNote) {
                 // Not used
             }
         });
-        
+
         Thread.sleep(100);
         player.stopPlayback();
         Thread.sleep(200);
-        
+
         // Should have played some notes but not all
         assertTrue(playedNotes.size() < 10, "Should not play all notes after stop");
     }
-    
+
     @Test
     void testEmptyTrack() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
-        
-        player.startPlayback(track, new TestHandler());
-        
+
+        player.startPlayback(testSource, new TestHandler());
+
         Thread.sleep(100);
         assertFalse(player.isPlaying(), "Should not be playing empty track");
         latch.countDown();
-        
+
         assertTrue(latch.await(1, TimeUnit.SECONDS));
     }
-    
+
     // Helper class for testing
     private static class TestHandler implements Player.NotePlaybackHandler {
         @Override
         public void onNoteOn(int midiNote) {
             // Empty implementation for testing
         }
-        
+
         @Override
         public void onNoteOff(int midiNote) {
             // Empty implementation for testing
         }
     }
 }
-
