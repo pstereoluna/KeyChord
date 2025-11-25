@@ -3,8 +3,8 @@ PROGRESS REPORT - KeyChord Virtual Piano Project
 
 (a) Brief, updated summary of what the project will do
 ------------------------------------------------------
-KeyChord is a professional-grade Java Swing application that provides an 
-interactive virtual piano with advanced recording and playback capabilities. 
+KeyChord is a Java Swing application that provides an 
+interactive virtual piano with recording and playback capabilities. 
 The application allows users to:
 
 - Play piano notes using computer keyboard (QWERTY mapping) or mouse clicks
@@ -59,18 +59,17 @@ The following Object-Oriented Design principles are evident throughout:
 
 (c) Which member(s) of the instructional team have you spoken with about this version?
 --------------------------------------------------------------------------------------
-[TO BE FILLED: List the TA(s) and/or Professor Mark you spoke with during 
-recitation. Example: "Spoke with TA [Name] and Professor Mark during recitation 
-on [date]."]
+Spoke with TA Jingjing during recitation on 20 November."
 
 
 (d) Whether or not the instructor/TA indicated that the project seems feasible 
     (not overly ambitious) and aligned with CS5004 objectives
 -------------------------------------------------------------------------------
-[TO BE FILLED: Example: "Yes, both TA and Professor Mark confirmed that the 
-project scope is appropriate - it demonstrates MVC, OOD principles, and 
-comprehensive testing without being overly complex. The MIDI audio component 
-adds technical depth while remaining feasible."]
+Yes. The TA indicated that the project is feasible and well aligned with CS5004 objectives. 
+She noted strong motivation and a solid OOD foundation, supported the MVP-first approach, 
+and suggested beginning to design the Controller and View. She also reminded us that 
+testing musical software can be tricky, so a clear unit-testing plan—starting with the 
+most testable components—will be important.
 
 
 (e) Rough sketch of a Class Diagram
@@ -150,39 +149,38 @@ ENTRY POINT:
 
 (f) The final list of Team Members working with you on the project
 ------------------------------------------------------------------
-[TO BE FILLED: If solo: "Solo project - no team members"
-If team: List all team member names]
+Jiaxin Jia, Xiaoyuan Lu
 
 
 (g) Roughly how many lines of Java code do you anticipate in your final submission?
 -----------------------------------------------------------------------------------
 Based on current implementation:
-- Source code: Approximately 3,350 lines
-- Test code: Approximately 1,500 lines
-- Total: Approximately 4,850 lines
+- Source code: Approximately 1,800 lines
+- Test code: Approximately 1,600 lines
+- Total: Approximately 3,400 lines
 
-Rounded to nearest 50: **4,850 lines**
+Rounded to nearest 50: **3,400 lines**
 
 
 (h) How many distinct files do you think will be involved, not counting presentation materials?
 ----------------------------------------------------------------------------------------------
 Source files:
-- Model classes: 10 files
+- Model classes: 9 files
 - View classes: 6 files
 - Controller classes: 4 files
 - Entry point: 1 file
-Total source: **21 Java files**
+Total source: **20 Java files**
 
 Test files:
-- Model tests: 10 files
+- Model tests: 9 files
 - View tests: 3 files
 - Controller tests: 4 files
-Total tests: **17 Java test files**
+Total tests: **16 Java test files**
 
 Configuration:
 - pom.xml: 1 file
 
-Total: **39 files** (21 source + 17 test + 1 config)
+Total: **37 files** (20 source + 16 test + 1 config)
 
 
 (i) How many lines of non-Java code, if any, do you anticipate being required?
@@ -190,17 +188,13 @@ Total: **39 files** (21 source + 17 test + 1 config)
 Non-Java code:
 - pom.xml (Maven configuration): ~60 lines
 - README.md (documentation): ~200 lines
-- PROJECT_ANALYSIS.md (analysis): ~900 lines
 
-Total: Approximately **1,160 lines** of non-Java code (mostly documentation)
+Total: Approximately **160 lines** of non-Java code (mostly documentation)
 
 
 (j) If you plan to avail of the allowed "up to 20%" AI-generated code, what will it be for?
 ------------------------------------------------------------------------------------------
-[TO BE FILLED: Be honest about AI usage. Example options:]
-
-Option 1 (if using AI):
-"I plan to use AI assistance (approximately 15% of codebase, ~500 lines) for:
+I plan to use AI assistance (approximately 15% of codebase, ~500 lines) for:
 - Initial project structure setup and boilerplate code
 - JUnit test templates and mock setup code
 - JavaDoc comment generation for standard getter/setter methods
@@ -208,11 +202,7 @@ Option 1 (if using AI):
 
 All AI-generated code will be reviewed, tested, and understood before 
 submission. Core business logic (chord generation, recording, playback) 
-will be written manually."
-
-Option 2 (if not using AI):
-"I do not plan to use AI-generated code for this project. All code will 
-be written manually to ensure full understanding and proper OOD principles."
+will be written manually.
 
 
 (k) Focus on highlighting your use of OOD principles
