@@ -59,7 +59,7 @@ The following Object-Oriented Design principles are evident throughout:
 
 (c) Which member(s) of the instructional team have you spoken with about this version?
 --------------------------------------------------------------------------------------
-Spoke with TA Jingjing during recitation on 20 November."
+Spoke with TA Jingjing during recitation on 20 November.
 
 
 (d) Whether or not the instructor/TA indicated that the project seems feasible 
@@ -175,7 +175,7 @@ Total tests: 16 Java test files
 Configuration:
 - pom.xml: 1 file
 
-Total: **37 files** (20 source + 16 test + 1 config)
+Total: 37 files (20 source + 16 test + 1 config)
 
 
 (i) How many lines of non-Java code, if any, do you anticipate being required?
