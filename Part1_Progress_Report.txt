@@ -189,7 +189,7 @@ Total: Approximately 160 lines of non-Java code (mostly documentation)
 
 (j) If you plan to avail of the allowed "up to 20%" AI-generated code, what will it be for?
 ------------------------------------------------------------------------------------------
-I plan to use AI assistance (approximately 15% of codebase, ~500 lines) for:
+We plan to use AI assistance (approximately 15% of codebase, ~500 lines) for:
 - Initial project structure setup and boilerplate code
 - JUnit test templates and mock setup code
 - JavaDoc comment generation for standard getter/setter methods
@@ -205,47 +205,27 @@ will be written manually.
 In addition to "testable" and "tested" code, and Javadocs for every file 
 and method, the following OOD principles are visible in the code:
 
-1. Abstraction: 
-   - EventSource interface abstracts the source of NoteEvents (Recording, Track)
-   - NotePlaybackHandler interface abstracts playback behavior
-   - KeyPressHandler interface abstracts key input handling
+1. SOLID Principles:
+   - Single Responsibility: Each class has one clear purpose (ChordManager generates 
+     chords only, Recorder handles timestamps only, each controller handles one aspect)
+   - Open/Closed: ChordManager extends via ChordType enum without modifying existing code
+   - Liskov Substitution: Player.EventSource allows interchangeable implementations
+   - Interface Segregation: Minimal interfaces (KeyPressHandler, NotePlaybackHandler)
+   - Dependency Inversion: Controllers depend on PianoModel, Player depends on 
+     EventSource interface
 
-2. Single Responsibility Principle (SOLID):
-   - ChordManager: Only generates chords, no audio or UI logic
-   - Recorder: Only manages recording timestamps, no playback logic
-   - MidiSoundManager: Only handles MIDI audio, no recording/playback logic
-   - Each controller handles one specific aspect (piano input, recording, playback)
+2. Abstraction: Interfaces (EventSource, NotePlaybackHandler, KeyPressHandler) 
+   hide implementation details
 
-3. Open/Closed Principle (SOLID):
-   - ChordManager can be extended with new ChordType enum values without 
-     modifying existing code
-   - Player can accept any EventSource implementation without modification
+3. Delegation over Inheritance: Controllers delegate to model methods; PianoModel 
+   delegates to specialized managers
 
-4. Interface Segregation Principle (SOLID):
-   - KeyPressHandler has minimal interface (only onKeyPressed/onKeyReleased)
-   - NotePlaybackHandler separates note-on and note-off concerns
+4. Composition over Inheritance: PianoModel composes managers; PianoView composes panels
 
-5. Dependency Inversion Principle (SOLID):
-   - Controllers depend on PianoModel interface, not concrete implementations
-   - Player depends on EventSource interface, not concrete Recording/Track
+5. Encapsulation: Private fields with controlled access; thread-safe synchronization
 
-6. Delegation over Inheritance:
-   - Controllers delegate to model methods rather than extending view components
-   - PianoModel delegates to specialized managers (RecordingManager, ChordManager)
-
-7. Composition over Inheritance:
-   - PianoModel composes multiple managers rather than inheriting functionality
-   - PianoView composes multiple panels (keyboard, control, recording)
-
-8. Encapsulation:
-   - All model classes use private fields with controlled access
-   - Thread-safe synchronization in Recording, RecordingManager, Recorder
-
-9. Separation of Concerns:
-    - Model has zero Swing dependencies (pure business logic)
-    - View has zero business logic (pure UI)
-    - Controllers mediate without containing business logic
-
+6. Separation of Concerns: Model has zero Swing dependencies; View has zero business 
+   logic; Controllers mediate without containing business logic
 
 These principles ensure the code is robust, extensible, maintainable, and 
 testable with minimal redundant coding.
