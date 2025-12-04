@@ -4,7 +4,6 @@ import model.PianoModel;
 import model.RecordingManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.fail;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import view.PianoView;
@@ -134,7 +133,7 @@ class RecordingPanelControllerTest {
     }
     
     @Test
-    void testExportRecording_UserCancels() {
+    void testExportRecording_UserCancels() throws java.io.IOException {
         when(recordingPanel.getSelectedRecording()).thenReturn("Recording 1");
         when(dialogService.chooseExportFile(view, "Recording 1")).thenReturn(null);
         
@@ -144,12 +143,7 @@ class RecordingPanelControllerTest {
         controller.actionPerformed(event);
         
         verify(dialogService, times(1)).chooseExportFile(view, "Recording 1");
-        try {
-            verify(recordingManager, never()).exportToMIDI(anyString(), any(File.class));
-        } catch (java.io.IOException e) {
-            // Should not happen since method is never called
-            fail("exportToMIDI should not be called when user cancels");
-        }
+        verify(recordingManager, never()).exportToMIDI(anyString(), any(File.class));
     }
     
     @Test
