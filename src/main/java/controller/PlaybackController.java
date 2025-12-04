@@ -32,8 +32,10 @@ public class PlaybackController implements KeyListener, ActionListener {
         this.view = view;
         this.pianoView = view.getPianoView();
         
-        // Register key listener
+        // Register key listener on multiple components to ensure events are captured
         view.addKeyListener(this);
+        pianoView.getKeyboardPanel().addKeyListener(this);
+        pianoView.addKeyListener(this);
         
         // Register button listener
         pianoView.getControlPanel().getPlayButton().addActionListener(this);
@@ -41,12 +43,17 @@ public class PlaybackController implements KeyListener, ActionListener {
     
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ENTER && !model.isRecording()) {
+        int keyCode = e.getKeyCode();
+        
+        // Enter key: Toggle playback (only if not recording)
+        // Note: If recording, RecordingController handles Enter to stop recording
+        if (keyCode == KeyEvent.VK_ENTER && !model.isRecording()) {
             if (!model.isPlaying()) {
                 startPlayback();
             } else {
                 stopPlayback();
             }
+            e.consume(); // Mark event as consumed
         }
     }
     

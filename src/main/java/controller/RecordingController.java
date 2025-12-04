@@ -33,8 +33,10 @@ public class RecordingController implements KeyListener, ActionListener {
         this.view = view;
         this.pianoView = view.getPianoView();
         
-        // Register key listener
+        // Register key listener on multiple components to ensure events are captured
         view.addKeyListener(this);
+        pianoView.getKeyboardPanel().addKeyListener(this);
+        pianoView.addKeyListener(this);
         
         // Register button listener
         pianoView.getControlPanel().getRecordButton().addActionListener(this);
@@ -45,13 +47,20 @@ public class RecordingController implements KeyListener, ActionListener {
     
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+        int keyCode = e.getKeyCode();
+        
+        // Space key: Start recording (if not already recording)
+        if (keyCode == KeyEvent.VK_SPACE) {
             if (!model.isRecording()) {
                 startRecording();
+                e.consume(); // Mark event as consumed
             }
-        } else if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+        }
+        // Enter key: Stop recording (if currently recording)
+        else if (keyCode == KeyEvent.VK_ENTER) {
             if (model.isRecording()) {
                 stopRecording();
+                e.consume(); // Mark event as consumed
             }
         }
     }
