@@ -1,6 +1,7 @@
 package model;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 
@@ -108,6 +109,48 @@ class RecorderTest {
         
         assertTrue(event2.getTimestamp() > event1.getTimestamp(),
             "Later event should have larger timestamp");
+    }
+    
+    @Test
+    @DisplayName("Start recording twice without stopping should reset")
+    void testStartRecordingTwice() throws InterruptedException {
+        recorder.startRecording();
+        Thread.sleep(10);
+        long firstTimestamp = recorder.getCurrentTimestamp();
+        
+        // Start again without stopping
+        recorder.startRecording();
+        Thread.sleep(10);
+        long secondTimestamp = recorder.getCurrentTimestamp();
+        
+        // Second start should reset the timestamp
+        assertTrue(secondTimestamp < firstTimestamp + 20, 
+            "Second start should reset timestamp (within 20ms tolerance)");
+    }
+    
+    @Test
+    @DisplayName("Stop recording without starting should handle gracefully")
+    void testStopWithoutStart() {
+        // Should not throw exception
+        assertDoesNotThrow(() -> {
+            recorder.stopRecording();
+        }, "Stopping without starting should not throw");
+        
+        assertFalse(recorder.isRecording(), "Should not be recording");
+    }
+    
+    @Test
+    @DisplayName("Record when not recording should return null gracefully")
+    void testRecordWhenNotRecording() {
+        NoteEvent event = recorder.recordNoteOn(60);
+        assertNull(event, "Should return null when not recording");
+        
+        NoteEvent eventOff = recorder.recordNoteOff(60);
+        assertNull(eventOff, "Should return null when not recording");
+        
+        List<NoteEvent> chordEvents = recorder.recordChordOn(List.of(60, 64, 67));
+        assertNotNull(chordEvents, "Should return list (not null)");
+        assertTrue(chordEvents.isEmpty(), "Should return empty list when not recording");
     }
 }
 

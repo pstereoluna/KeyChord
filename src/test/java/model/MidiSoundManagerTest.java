@@ -2,6 +2,7 @@ package model;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import javax.sound.midi.MidiUnavailableException;
 
@@ -150,6 +151,50 @@ class MidiSoundManagerTest {
             // All should play simultaneously
             manager.allNotesOff();
         });
+    }
+    
+    @Test
+    @DisplayName("Play same note twice without stopping (polyphony)")
+    void testPlaySameNoteTwice() throws MidiUnavailableException {
+        MidiSoundManager manager = MidiSoundManager.getInstance();
+        
+        // Play same note twice without stopping
+        assertDoesNotThrow(() -> {
+            manager.playNote(60);
+            manager.playNote(60); // Same note again
+            manager.stopNote(60);
+        }, "Should handle playing same note twice");
+    }
+    
+    @Test
+    @DisplayName("Stop note that was never started")
+    void testStopNoteNeverStarted() throws MidiUnavailableException {
+        MidiSoundManager manager = MidiSoundManager.getInstance();
+        
+        // Should not throw exception
+        assertDoesNotThrow(() -> {
+            manager.stopNote(60); // Stop note that was never played
+        }, "Stopping unplayed note should not throw");
+    }
+    
+    @Test
+    @DisplayName("Call methods after close()")
+    void testMethodsAfterClose() throws MidiUnavailableException {
+        MidiSoundManager manager = MidiSoundManager.getInstance();
+        manager.close();
+        
+        // Methods should handle closed state gracefully
+        assertDoesNotThrow(() -> {
+            manager.playNote(60);
+        }, "playNote after close should not throw");
+        
+        assertDoesNotThrow(() -> {
+            manager.stopNote(60);
+        }, "stopNote after close should not throw");
+        
+        assertDoesNotThrow(() -> {
+            manager.allNotesOff();
+        }, "allNotesOff after close should not throw");
     }
 }
 

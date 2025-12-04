@@ -1,6 +1,7 @@
 package model;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 
@@ -167,6 +168,46 @@ class RecordingTest {
         for (NoteEvent event : events) {
             assertEquals(timestamp, event.getTimestamp(), "All chord notes should have same timestamp");
         }
+    }
+    
+    @Test
+    @DisplayName("Recording with 10000+ events should handle performance")
+    void testLargeRecording() {
+        // Add 10000 events
+        for (int i = 0; i < 10000; i++) {
+            recording.addNoteEvent(new NoteEvent(60 + (i % 12), i * 10, i % 2 == 0));
+        }
+        
+        assertEquals(10000, recording.getEventCount(), "Should have 10000 events");
+        assertFalse(recording.isEmpty(), "Should not be empty");
+        
+        // Verify getEvents() still works and returns sorted
+        List<NoteEvent> events = recording.getEvents();
+        assertEquals(10000, events.size(), "Should return all events");
+        
+        // Verify sorted order
+        for (int i = 1; i < events.size(); i++) {
+            assertTrue(events.get(i).getTimestamp() >= events.get(i - 1).getTimestamp(),
+                "Events should be sorted by timestamp");
+        }
+    }
+    
+    @Test
+    @DisplayName("Events added out of order should be sorted by getEvents")
+    void testOutOfOrderEvents() {
+        // Add events in reverse timestamp order
+        recording.addNoteEvent(new NoteEvent(60, 3000, true));
+        recording.addNoteEvent(new NoteEvent(64, 1000, true));
+        recording.addNoteEvent(new NoteEvent(67, 2000, true));
+        recording.addNoteEvent(new NoteEvent(60, 500, false));
+        
+        List<NoteEvent> events = recording.getEvents();
+        
+        // Verify sorted by timestamp
+        assertEquals(500, events.get(0).getTimestamp(), "First event should be earliest");
+        assertEquals(1000, events.get(1).getTimestamp());
+        assertEquals(2000, events.get(2).getTimestamp());
+        assertEquals(3000, events.get(3).getTimestamp(), "Last event should be latest");
     }
 }
 

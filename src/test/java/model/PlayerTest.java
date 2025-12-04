@@ -1,6 +1,7 @@
 package model;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
@@ -157,6 +158,91 @@ class PlayerTest {
         latch.countDown();
 
         assertTrue(latch.await(1, TimeUnit.SECONDS));
+    }
+    
+    @Test
+    @DisplayName("Playback with 0ms delay between events")
+    void testPlaybackWithZeroDelay() throws InterruptedException {
+        // Add events with 0ms delay
+        testSource.addNoteEvent(new NoteEvent(60, 0, true));
+        testSource.addNoteEvent(new NoteEvent(64, 0, true));
+        testSource.addNoteEvent(new NoteEvent(67, 0, true));
+        
+        List<Integer> playedNotes = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(3);
+        
+        player.startPlayback(testSource, new Player.NotePlaybackHandler() {
+            @Override
+            public void onNoteOn(int midiNote) {
+                playedNotes.add(midiNote);
+                latch.countDown();
+            }
+            
+            @Override
+            public void onNoteOff(int midiNote) {
+                // Not used
+            }
+        });
+        
+        assertTrue(latch.await(1, TimeUnit.SECONDS), "All events should be played");
+        assertEquals(3, playedNotes.size(), "Should play all 3 notes");
+    }
+    
+    @Test
+    @DisplayName("Playback interrupted mid-stream")
+    void testPlaybackInterrupted() throws InterruptedException {
+        // Add many events with delays
+        for (int i = 0; i < 20; i++) {
+            testSource.addNoteEvent(new NoteEvent(60 + i, i * 100, true));
+        }
+        
+        List<Integer> playedNotes = new ArrayList<>();
+        
+        player.startPlayback(testSource, new Player.NotePlaybackHandler() {
+            @Override
+            public void onNoteOn(int midiNote) {
+                playedNotes.add(midiNote);
+            }
+            
+            @Override
+            public void onNoteOff(int midiNote) {
+                // Not used
+            }
+        });
+        
+        Thread.sleep(300); // Let some events play
+        player.stopPlayback();
+        Thread.sleep(500); // Wait for stop to take effect
+        
+        assertFalse(player.isPlaying(), "Should not be playing after stop");
+        assertTrue(playedNotes.size() < 20, "Should not play all notes");
+    }
+    
+    @Test
+    @DisplayName("Very long delays between events")
+    void testPlaybackWithLongDelays() throws InterruptedException {
+        testSource.addNoteEvent(new NoteEvent(60, 0, true));
+        testSource.addNoteEvent(new NoteEvent(64, 1000, true)); // 1 second delay
+        testSource.addNoteEvent(new NoteEvent(67, 2000, true)); // 2 second delay
+        
+        List<Integer> playedNotes = new ArrayList<>();
+        CountDownLatch latch = new CountDownLatch(3);
+        
+        player.startPlayback(testSource, new Player.NotePlaybackHandler() {
+            @Override
+            public void onNoteOn(int midiNote) {
+                playedNotes.add(midiNote);
+                latch.countDown();
+            }
+            
+            @Override
+            public void onNoteOff(int midiNote) {
+                // Not used
+            }
+        });
+        
+        assertTrue(latch.await(3, TimeUnit.SECONDS), "All events should be played with long delays");
+        assertEquals(3, playedNotes.size(), "Should play all 3 notes");
     }
 
     // Helper class for testing

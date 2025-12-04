@@ -1,6 +1,7 @@
 package model;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.util.List;
 
@@ -150,6 +151,38 @@ class ChordManagerTest {
         // Test that default is used when no type specified
         List<Integer> chord = chordManager.generateChord(60);
         assertTrue(chord.contains(63), "Should use minor chord intervals");
+    }
+    
+    @Test
+    @DisplayName("Chord at MIDI 125 should exclude notes above 127")
+    void testChordAtHighBoundary() {
+        // Test chord at MIDI 125 - some notes would exceed 127
+        List<Integer> chord = chordManager.generateChord(125, ChordManager.ChordType.MAJOR);
+        
+        // Major chord: 125, 129, 132 - but 129 and 132 exceed 127
+        assertTrue(chord.size() >= 1, "Should have at least root note");
+        assertTrue(chord.contains(125), "Should contain root note 125");
+        
+        // Verify no notes exceed 127
+        for (Integer note : chord) {
+            assertTrue(note <= 127, "Note should not exceed 127: " + note);
+            assertTrue(note >= 0, "Note should not be negative: " + note);
+        }
+    }
+    
+    @Test
+    @DisplayName("Chord at MIDI 0 should work correctly")
+    void testChordAtLowBoundary() {
+        List<Integer> chord = chordManager.generateChord(0, ChordManager.ChordType.MAJOR);
+        
+        assertTrue(chord.size() >= 1, "Should have at least root note");
+        assertTrue(chord.contains(0), "Should contain root note 0");
+        
+        // Verify no notes are negative
+        for (Integer note : chord) {
+            assertTrue(note >= 0, "Note should not be negative: " + note);
+            assertTrue(note <= 127, "Note should not exceed 127: " + note);
+        }
     }
 }
 

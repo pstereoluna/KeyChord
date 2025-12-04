@@ -1,6 +1,7 @@
 package model;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.io.IOException;
@@ -231,6 +232,78 @@ class RecordingManagerTest {
         
         // Names should be different (counter increments)
         assertNotEquals(saved1.getName(), saved2.getName(), "Recording names should be different");
+    }
+    
+    @Test
+    @DisplayName("Save recording with special characters in name")
+    void testSaveRecordingWithSpecialCharacters() {
+        Recording recording = new Recording("Test");
+        recording.addNoteEvent(new NoteEvent(60, 0, true));
+        
+        // Test various special characters
+        String[] specialNames = {
+            "Recording (1)",
+            "Recording [2]",
+            "Recording-3",
+            "Recording_4",
+            "Recording@5",
+            "Recording#6"
+        };
+        
+        for (String name : specialNames) {
+            assertDoesNotThrow(() -> {
+                manager.saveRecording(name, new Recording(name));
+            }, "Should handle special characters in name: " + name);
+            
+            assertNotNull(manager.getRecording(name), "Should retrieve recording with special characters: " + name);
+        }
+    }
+    
+    @Test
+    @DisplayName("Save recording with very long name")
+    void testSaveRecordingWithLongName() {
+        // Create a very long name (1000+ chars)
+        StringBuilder longName = new StringBuilder("Recording ");
+        for (int i = 0; i < 1000; i++) {
+            longName.append("X");
+        }
+        
+        Recording recording = new Recording(longName.toString());
+        recording.addNoteEvent(new NoteEvent(60, 0, true));
+        
+        assertDoesNotThrow(() -> {
+            manager.saveRecording(longName.toString(), recording);
+        }, "Should handle very long name");
+        
+        assertNotNull(manager.getRecording(longName.toString()), "Should retrieve recording with long name");
+    }
+    
+    @Test
+    @DisplayName("Rename to same name should throw exception")
+    void testRenameToSameName() {
+        manager.startRecording();
+        manager.stopRecording("Same Name");
+        
+        assertThrows(IllegalArgumentException.class, () -> {
+            manager.renameRecording("Same Name", "Same Name");
+        }, "Should throw exception when renaming to same name");
+    }
+    
+    @Test
+    @DisplayName("Export empty recording to MIDI")
+    void testExportEmptyRecording() throws IOException {
+        Recording emptyRecording = new Recording("Empty");
+        manager.saveRecording("Empty", emptyRecording);
+        
+        File tempFile = File.createTempFile("test_empty", ".mid");
+        tempFile.deleteOnExit();
+        
+        // Should not throw exception (empty MIDI file is valid)
+        assertDoesNotThrow(() -> {
+            manager.exportToMIDI("Empty", tempFile);
+        }, "Exporting empty recording should not throw");
+        
+        assertTrue(tempFile.exists(), "MIDI file should be created even for empty recording");
     }
 }
 
