@@ -148,13 +148,50 @@ public class RecordingManager {
     /**
      * Gets a list of all recording names.
      * 
-     * @return a list of recording names, sorted alphabetically
+     * @return a list of recording names, sorted with natural ordering for "Recording X" format
      */
     public List<String> listRecordings() {
         synchronized (lock) {
             List<String> names = new ArrayList<>(recordings.keySet());
-            Collections.sort(names);
+            // Sort with natural ordering: "Recording X" format sorted by number, others alphabetically
+            Collections.sort(names, (name1, name2) -> {
+                // Try to extract numbers from "Recording X" format
+                Integer num1 = extractRecordingNumber(name1);
+                Integer num2 = extractRecordingNumber(name2);
+                
+                if (num1 != null && num2 != null) {
+                    // Both are "Recording X" format, sort by number
+                    return Integer.compare(num1, num2);
+                } else if (num1 != null) {
+                    // name1 is "Recording X", name2 is not - put "Recording X" first
+                    return -1;
+                } else if (num2 != null) {
+                    // name2 is "Recording X", name1 is not - put "Recording X" first
+                    return 1;
+                } else {
+                    // Neither is "Recording X" format, sort alphabetically
+                    return name1.compareTo(name2);
+                }
+            });
             return Collections.unmodifiableList(names);
+        }
+    }
+    
+    /**
+     * Extracts the number from a "Recording X" format string.
+     * 
+     * @param name the recording name
+     * @return the number if the name matches "Recording X" format, null otherwise
+     */
+    private Integer extractRecordingNumber(String name) {
+        if (name == null || !name.startsWith("Recording ")) {
+            return null;
+        }
+        try {
+            String numberPart = name.substring("Recording ".length()).trim();
+            return Integer.parseInt(numberPart);
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
     
