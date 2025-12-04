@@ -1,0 +1,61 @@
+PART 2: WINSTON VIDEO - "How to Speak"
+========================================
+
+Five examples of Winston's advice that we plan to follow in presenting our Final Project:
+
+1. THE EMPOWERMENT PROMISE (How to Start)
+------------------------------------------
+Winston: Start with an empowerment promise - tell the audience what they will know 
+at the end that they didn't know at the beginning.
+
+OUR APPLICATION:
+We will start with: "Today we're going to show you KeyChord, a virtual piano app 
+we built. We'll walk you through how we used MVC architecture, SOLID principles, 
+and some design patterns, and show you how they work together in the code."
+
+
+2. CYCLING (Repetition)
+------------------------
+Winston: Go around the subject three times. ~20% of the audience is "fogged out" 
+at any moment, so repetition ensures everyone gets it.
+
+OUR APPLICATION:
+We will cycle through MVC three times: overview, detailed examples, then synthesis.
+
+
+3. BUILDING A FENCE (Distinguish Your Work)
+---------------------------------------------
+Winston: Distinguish your idea from others using "time and place."
+
+OUR APPLICATION:
+We will distinguish KeyChord by emphasizing strict MVC separation with zero 
+cross-layer dependencies, and how every design decision serves a purpose.
+
+
+4. USE PROPS AND DEMONSTRATIONS
+--------------------------------
+Winston: Props work through empathetic mirroring. When you handle a physical 
+object, the audience's mirror neurons fire.
+
+OUR APPLICATION:
+We will live-demo the application (play, record, playback, export MIDI), show 
+keyboard highlighting during playback, display code structure in IDE, and run 
+unit tests to demonstrate test coverage.
+
+
+5. HOW TO STOP (Final Slide)
+-----------------------------
+Winston: The final slide should show Contributions, not "Thank you" or "The End."
+
+OUR APPLICATION:
+FINAL SLIDE - "Contributions":
+- Demonstrated strict MVC architecture with zero cross-layer dependencies
+- Applied all five SOLID principles in a practical application
+- Implemented three design patterns (Singleton, Strategy, Adapter)
+- Achieved comprehensive unit test coverage
+- Created a functional virtual piano with recording and MIDI export
+
+FINAL WORDS:
+Instead of "Thank you," we will say: "We've enjoyed sharing KeyChord with you. 
+We value your feedback, and we look forward to discussing how these OOD principles 
+can be applied to other projects."

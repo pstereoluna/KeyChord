@@ -33,9 +33,18 @@ public class PianoController implements KeyListener, ActionListener {
         this.view = view;
         this.pianoView = view.getPianoView();
 
-        // Register this controller as a key listener
+        // Register key listener on both frame and keyboard panel
+        // Frame for global capture, panel for when it has focus
         view.addKeyListener(this);
-        pianoView.getKeyboardPanel().setFocusable(true);
+        
+        // Make keyboard panel focusable and add listener
+        view.PianoKeyboardPanel keyboardPanel = pianoView.getKeyboardPanel();
+        keyboardPanel.setFocusable(true);
+        keyboardPanel.addKeyListener(this);
+        
+        // Also make the piano view focusable as backup
+        pianoView.setFocusable(true);
+        pianoView.addKeyListener(this);
 
         // Register for chord mode selector changes
         pianoView.getControlPanel().getChordSelector().addActionListener(this);
@@ -159,7 +168,7 @@ public class PianoController implements KeyListener, ActionListener {
         char keyChar = e.getKeyChar();
         int keyCode = e.getKeyCode();
 
-        // Handle special keys (Space, Enter, number keys)
+        // Handle special keys (Space, Enter) - let other controllers handle these
         if (keyCode == KeyEvent.VK_SPACE) {
             // Recording is handled by RecordingController
             return;
@@ -171,10 +180,13 @@ public class PianoController implements KeyListener, ActionListener {
         }
 
         // Handle piano keys
-        if (KeyMappings.isMapped(keyChar)) {
-            int rootNote = KeyMappings.getMidiNote(keyChar);
+        // Use both keyChar and keyCode to handle different key event types
+        char lowerChar = Character.toLowerCase(keyChar);
+        if (keyChar != KeyEvent.CHAR_UNDEFINED && KeyMappings.isMapped(lowerChar)) {
+            int rootNote = KeyMappings.getMidiNote(lowerChar);
             if (rootNote >= 0) {
                 handleNotePressed(rootNote);
+                e.consume(); // Mark event as consumed
             }
         }
     }
@@ -190,10 +202,12 @@ public class PianoController implements KeyListener, ActionListener {
         }
 
         // Handle piano keys - stop note/chord
-        if (KeyMappings.isMapped(keyChar)) {
-            int rootNote = KeyMappings.getMidiNote(keyChar);
+        char lowerChar = Character.toLowerCase(keyChar);
+        if (keyChar != KeyEvent.CHAR_UNDEFINED && KeyMappings.isMapped(lowerChar)) {
+            int rootNote = KeyMappings.getMidiNote(lowerChar);
             if (rootNote >= 0) {
                 handleNoteReleased(rootNote);
+                e.consume(); // Mark event as consumed
             }
         }
     }

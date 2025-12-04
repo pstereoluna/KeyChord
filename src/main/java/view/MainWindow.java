@@ -28,7 +28,12 @@ public class MainWindow extends JFrame {
         contentPane.add(pianoView, BorderLayout.CENTER);
         
         // Make frame focusable for keyboard input
+        // JFrame needs special setup to receive keyboard events
         setFocusable(true);
+        setFocusableWindowState(true);
+        
+        // Enable key events on the frame
+        enableEvents(java.awt.AWTEvent.KEY_EVENT_MASK);
     }
     
     /**
@@ -55,7 +60,42 @@ public class MainWindow extends JFrame {
         setLocationRelativeTo(null);
         
         setVisible(true);
-        requestFocus();
+        
+        // Use SwingUtilities to ensure focus is set after window is fully visible
+        SwingUtilities.invokeLater(() -> {
+            // Try multiple components to ensure keyboard events are captured
+            pianoView.getKeyboardPanel().requestFocusInWindow();
+            if (!pianoView.getKeyboardPanel().isFocusOwner()) {
+                pianoView.requestFocusInWindow();
+            }
+            if (!pianoView.isFocusOwner()) {
+                requestFocusInWindow();
+            }
+        });
+        
+        // Add window focus listener to ensure keyboard panel gets focus when window gains focus
+        addWindowFocusListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowGainedFocus(java.awt.event.WindowEvent e) {
+                SwingUtilities.invokeLater(() -> {
+                    pianoView.getKeyboardPanel().requestFocusInWindow();
+                });
+            }
+        });
+        
+        // Add focus listener to keyboard panel to keep it focused
+        pianoView.getKeyboardPanel().addFocusListener(new java.awt.event.FocusAdapter() {
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
+                // If focus is lost to another component in our window, try to get it back
+                if (e.getOppositeComponent() == null || 
+                    SwingUtilities.isDescendingFrom(e.getOppositeComponent(), MainWindow.this)) {
+                    SwingUtilities.invokeLater(() -> {
+                        pianoView.getKeyboardPanel().requestFocusInWindow();
+                    });
+                }
+            }
+        });
     }
 }
 
