@@ -1,3 +1,4 @@
+import controller.DefaultDialogService;
 import controller.PianoController;
 import controller.PlaybackController;
 import controller.RecordingController;
@@ -33,7 +34,8 @@ public class KeyChordApp {
                 PianoController pianoController = new PianoController(model, view);
                 RecordingController recordingController = new RecordingController(model, view);
                 PlaybackController playbackController = new PlaybackController(model, view);
-                RecordingPanelController recordingPanelController = new RecordingPanelController(model, view.getPianoView());
+                RecordingPanelController recordingPanelController = new RecordingPanelController(
+                    model, view.getPianoView(), new DefaultDialogService());
                 
                 // Show window
                 view.showWindow();

@@ -11,14 +11,12 @@ import view.PianoView;
 
 import java.awt.event.KeyEvent;
 import java.awt.Component;
-import java.util.List;
 
 import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for PianoController.
- * Tests keyboard event routing and chord generation.
- * Updated for RecordingManager architecture.
+ * Tests keyboard event routing and chord generation with specific verifications.
  */
 class PianoControllerTest {
     @Mock
@@ -40,6 +38,7 @@ class PianoControllerTest {
     private javax.swing.JComboBox<String> chordSelector;
     
     private PianoController controller;
+    private ChordManager chordManager;
     
     @BeforeEach
     void setUp() {
@@ -50,7 +49,7 @@ class PianoControllerTest {
         when(controlPanel.getChordSelector()).thenReturn(chordSelector);
         when(controlPanel.getSelectedChordMode()).thenReturn("Single Note");
         
-        ChordManager chordManager = new ChordManager();
+        chordManager = new ChordManager();
         when(model.getChordManager()).thenReturn(chordManager);
         
         controller = new PianoController(model, view);
@@ -58,42 +57,155 @@ class PianoControllerTest {
     
     @Test
     void testKeyPressedWithMappedKeySingleNote() {
-        // Create a mock key event for 'a' key
+        // Test with 'c' key which maps to MIDI 60 (C4)
         KeyEvent keyEvent = new KeyEvent(
             mock(Component.class),
             KeyEvent.KEY_PRESSED,
             System.currentTimeMillis(),
             0,
-            KeyEvent.VK_A,
-            'a'
+            KeyEvent.VK_C,
+            'c'
         );
         
         when(controlPanel.getSelectedChordMode()).thenReturn("Single Note");
         
         controller.keyPressed(keyEvent);
         
-        // Verify that playNote was called (not playChord)
-        verify(model, times(1)).playNote(anyInt());
+        // Verify that playNote was called with exact MIDI note 60
+        verify(model, times(1)).playNote(60);
         verify(model, never()).playChord(anyInt());
     }
     
     @Test
-    void testKeyPressedWithMappedKeyChordMode() {
-        KeyEvent keyEvent = new KeyEvent(
-            mock(Component.class),
-            KeyEvent.KEY_PRESSED,
-            System.currentTimeMillis(),
-            0,
-            KeyEvent.VK_A,
-            'a'
-        );
-        
+    void testHandleNotePressedChordMode_Major() {
         when(controlPanel.getSelectedChordMode()).thenReturn("Major");
+        when(model.isRecording()).thenReturn(false);
         
-        controller.keyPressed(keyEvent);
+        // C major chord: C(60), E(64), G(67)
+        controller.handleNotePressed(60);
         
-        // Verify that playNote was called for each chord note
-        verify(model, atLeast(1)).playNote(anyInt());
+        // Verify exact notes are played without recording
+        verify(model, times(1)).playNoteWithoutRecording(60);
+        verify(model, times(1)).playNoteWithoutRecording(64);
+        verify(model, times(1)).playNoteWithoutRecording(67);
+        verify(model, never()).playNote(anyInt()); // Should not use playNote when not recording
+        
+        // Verify highlightKeys is called with correct list
+        verify(keyboardPanel, times(1)).highlightKeys(argThat(list -> 
+            list.size() == 3 && 
+            list.contains(60) && 
+            list.contains(64) && 
+            list.contains(67)
+        ));
+    }
+    
+    @Test
+    void testHandleNotePressedChordMode_WhenRecording() {
+        when(controlPanel.getSelectedChordMode()).thenReturn("Major");
+        when(model.isRecording()).thenReturn(true);
+        
+        // C major chord: C(60), E(64), G(67)
+        controller.handleNotePressed(60);
+        
+        // When recording, should use playNote (which records) instead of playNoteWithoutRecording
+        verify(model, times(1)).playNote(60);
+        verify(model, times(1)).playNote(64);
+        verify(model, times(1)).playNote(67);
+        verify(model, never()).playNoteWithoutRecording(anyInt());
+        
+        // Verify highlightKeys is called with correct list
+        verify(keyboardPanel, times(1)).highlightKeys(argThat(list -> 
+            list.size() == 3 && 
+            list.contains(60) && 
+            list.contains(64) && 
+            list.contains(67)
+        ));
+    }
+    
+    @Test
+    void testHandleNoteReleasedChordMode_Major() {
+        when(controlPanel.getSelectedChordMode()).thenReturn("Major");
+        when(model.isRecording()).thenReturn(false);
+        
+        // C major chord: C(60), E(64), G(67)
+        controller.handleNoteReleased(60);
+        
+        // Verify exact notes are stopped without recording
+        verify(model, times(1)).stopNoteWithoutRecording(60);
+        verify(model, times(1)).stopNoteWithoutRecording(64);
+        verify(model, times(1)).stopNoteWithoutRecording(67);
+        verify(model, never()).stopNote(anyInt()); // Should not use stopNote when not recording
+        
+        // Verify unhighlightKeys is called with correct list
+        verify(keyboardPanel, times(1)).unhighlightKeys(argThat(list -> 
+            list.size() == 3 && 
+            list.contains(60) && 
+            list.contains(64) && 
+            list.contains(67)
+        ));
+    }
+    
+    @Test
+    void testHandleNoteReleasedChordMode_WhenRecording() {
+        when(controlPanel.getSelectedChordMode()).thenReturn("Major");
+        when(model.isRecording()).thenReturn(true);
+        
+        // C major chord: C(60), E(64), G(67)
+        controller.handleNoteReleased(60);
+        
+        // When recording, should use stopNote (which records) instead of stopNoteWithoutRecording
+        verify(model, times(1)).stopNote(60);
+        verify(model, times(1)).stopNote(64);
+        verify(model, times(1)).stopNote(67);
+        verify(model, never()).stopNoteWithoutRecording(anyInt());
+        
+        // Verify unhighlightKeys is called with correct list
+        verify(keyboardPanel, times(1)).unhighlightKeys(argThat(list -> 
+            list.size() == 3 && 
+            list.contains(60) && 
+            list.contains(64) && 
+            list.contains(67)
+        ));
+    }
+    
+    @Test
+    void testHandleNotePressedSingleNote() {
+        when(controlPanel.getSelectedChordMode()).thenReturn("Single Note");
+        
+        controller.handleNotePressed(60);
+        
+        verify(model, times(1)).playNote(60);
+        verify(keyboardPanel, times(1)).highlightKey(60);
+    }
+    
+    @Test
+    void testHandleNoteReleasedSingleNote() {
+        when(controlPanel.getSelectedChordMode()).thenReturn("Single Note");
+        
+        controller.handleNoteReleased(60);
+        
+        verify(model, times(1)).stopNote(60);
+        verify(keyboardPanel, times(1)).unhighlightKey(60);
+    }
+    
+    @Test
+    void testHandleNotePressedChordMode_Minor() {
+        when(controlPanel.getSelectedChordMode()).thenReturn("Minor");
+        when(model.isRecording()).thenReturn(false);
+        
+        // C minor chord: C(60), D#(63), G(67)
+        controller.handleNotePressed(60);
+        
+        verify(model, times(1)).playNoteWithoutRecording(60);
+        verify(model, times(1)).playNoteWithoutRecording(63);
+        verify(model, times(1)).playNoteWithoutRecording(67);
+        
+        verify(keyboardPanel, times(1)).highlightKeys(argThat(list -> 
+            list.size() == 3 && 
+            list.contains(60) && 
+            list.contains(63) && 
+            list.contains(67)
+        ));
     }
     
     @Test
@@ -133,64 +245,41 @@ class PianoControllerTest {
     }
     
     @Test
+    void testKeyPressedWithUnmappedKey() {
+        // 'a' is not mapped in KeyMappings
+        KeyEvent keyEvent = new KeyEvent(
+            mock(Component.class),
+            KeyEvent.KEY_PRESSED,
+            System.currentTimeMillis(),
+            0,
+            KeyEvent.VK_A,
+            'a'
+        );
+        
+        controller.keyPressed(keyEvent);
+        
+        // Unmapped key should not trigger any model calls
+        verify(model, never()).playNote(anyInt());
+        verify(model, never()).playChord(anyInt());
+    }
+    
+    @Test
     void testKeyReleasedWithMappedKeySingleNote() {
+        // Test with 'c' key which maps to MIDI 60
         KeyEvent keyEvent = new KeyEvent(
             mock(Component.class),
             KeyEvent.KEY_RELEASED,
             System.currentTimeMillis(),
             0,
-            KeyEvent.VK_A,
-            'a'
+            KeyEvent.VK_C,
+            'c'
         );
         
         when(controlPanel.getSelectedChordMode()).thenReturn("Single Note");
         
         controller.keyReleased(keyEvent);
         
-        // Verify that stopNote was called
-        verify(model, times(1)).stopNote(anyInt());
-    }
-    
-    @Test
-    void testKeyReleasedWithMappedKeyChordMode() {
-        KeyEvent keyEvent = new KeyEvent(
-            mock(Component.class),
-            KeyEvent.KEY_RELEASED,
-            System.currentTimeMillis(),
-            0,
-            KeyEvent.VK_A,
-            'a'
-        );
-        
-        when(controlPanel.getSelectedChordMode()).thenReturn("Major");
-        
-        controller.keyReleased(keyEvent);
-        
-        // Verify that stopNote was called for each chord note
-        verify(model, atLeast(1)).stopNote(anyInt());
-    }
-    
-    @Test
-    void testHandleNotePressedSingleNote() {
-        when(controlPanel.getSelectedChordMode()).thenReturn("Single Note");
-        
-        controller.handleNotePressed(60);
-        
-        verify(model, times(1)).playNote(60);
-        verify(keyboardPanel, times(1)).highlightKey(60);
-    }
-    
-    @Test
-    void testHandleNotePressedChordMode() {
-        when(controlPanel.getSelectedChordMode()).thenReturn("Major");
-        ChordManager chordManager = new ChordManager();
-        when(model.getChordManager()).thenReturn(chordManager);
-        List<Integer> chordNotes = chordManager.generateChord(60, ChordManager.ChordType.MAJOR);
-        
-        controller.handleNotePressed(60);
-        
-        // Should play each note in the chord
-        verify(model, times(chordNotes.size())).playNote(anyInt());
-        verify(keyboardPanel, times(1)).highlightKeys(anyList());
+        // Verify that stopNote was called with exact MIDI note 60
+        verify(model, times(1)).stopNote(60);
     }
 }

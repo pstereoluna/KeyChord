@@ -1,7 +1,6 @@
 package controller;
 
 import model.PianoModel;
-import model.Recording;
 import model.RecordingManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,13 +11,14 @@ import view.RecordingPanel;
 import view.ControlPanelView;
 
 import java.awt.event.ActionEvent;
+import java.io.File;
 import java.util.Arrays;
 
 import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for RecordingPanelController.
- * Tests play, delete, export, and rename operations.
+ * Tests play, delete, export, and rename operations with mocked DialogService.
  */
 class RecordingPanelControllerTest {
     @Mock
@@ -37,7 +37,7 @@ class RecordingPanelControllerTest {
     private RecordingManager recordingManager;
     
     @Mock
-    private Recording recording;
+    private DialogService dialogService;
     
     private RecordingPanelController controller;
     
@@ -49,13 +49,12 @@ class RecordingPanelControllerTest {
         when(model.getRecordingManager()).thenReturn(recordingManager);
         when(recordingManager.listRecordings()).thenReturn(Arrays.asList("Recording 1"));
         
-        controller = new RecordingPanelController(model, view);
+        controller = new RecordingPanelController(model, view, dialogService);
     }
     
     @Test
     void testPlayRecording() {
         when(recordingPanel.getSelectedRecording()).thenReturn("Recording 1");
-        when(recordingManager.getRecording("Recording 1")).thenReturn(recording);
         when(model.isPlaying()).thenReturn(false).thenReturn(true).thenReturn(false);
         
         ActionEvent event = new ActionEvent(recordingPanel.getPlayButton(), 
@@ -64,6 +63,8 @@ class RecordingPanelControllerTest {
         controller.actionPerformed(event);
         
         verify(model, times(1)).startPlayback("Recording 1");
+        verify(controlPanel, times(1)).setStatus("Playing: Recording 1");
+        verify(controlPanel, times(1)).setPlayingState(true);
     }
     
     @Test
@@ -75,61 +76,166 @@ class RecordingPanelControllerTest {
         
         controller.actionPerformed(event);
         
-        // Should not start playback
+        // Should show message and not start playback
+        verify(dialogService, times(1)).showMessage(eq(view), 
+            eq("Please select a recording first."), eq("No Selection"));
         verify(model, never()).startPlayback(anyString());
     }
     
     @Test
-    void testDeleteRecording() {
+    void testDeleteRecording_UserConfirms() {
         when(recordingPanel.getSelectedRecording()).thenReturn("Recording 1");
+        when(dialogService.confirmDelete(view, "Recording 1")).thenReturn(true);
         when(recordingManager.deleteRecording("Recording 1")).thenReturn(true);
         when(recordingManager.listRecordings()).thenReturn(Arrays.asList());
         
         ActionEvent event = new ActionEvent(recordingPanel.getDeleteButton(), 
             ActionEvent.ACTION_PERFORMED, "");
         
-        // Mock JOptionPane to return YES_OPTION
-        // Note: This is a simplified test - in practice, you'd need to handle the dialog
-        
         controller.actionPerformed(event);
         
-        // Verify delete was called (if user confirmed)
-        // Note: Actual implementation shows dialog, so this test is limited
+        verify(dialogService, times(1)).confirmDelete(view, "Recording 1");
+        verify(recordingManager, times(1)).deleteRecording("Recording 1");
+        verify(controlPanel, times(1)).setStatus("Deleted: Recording 1");
+        verify(recordingPanel, times(1)).updateRecordings(anyList());
     }
     
     @Test
-    void testExportRecording() {
+    void testDeleteRecording_UserCancels() {
         when(recordingPanel.getSelectedRecording()).thenReturn("Recording 1");
-        when(recordingManager.getRecording("Recording 1")).thenReturn(recording);
+        when(dialogService.confirmDelete(view, "Recording 1")).thenReturn(false);
+        
+        ActionEvent event = new ActionEvent(recordingPanel.getDeleteButton(), 
+            ActionEvent.ACTION_PERFORMED, "");
+        
+        controller.actionPerformed(event);
+        
+        verify(dialogService, times(1)).confirmDelete(view, "Recording 1");
+        verify(recordingManager, never()).deleteRecording(anyString());
+        verify(controlPanel, never()).setStatus(anyString());
+    }
+    
+    @Test
+    void testExportRecording_UserSelectsFile() throws java.io.IOException {
+        when(recordingPanel.getSelectedRecording()).thenReturn("Recording 1");
+        File exportFile = new File("test.mid");
+        when(dialogService.chooseExportFile(view, "Recording 1")).thenReturn(exportFile);
         
         ActionEvent event = new ActionEvent(recordingPanel.getExportButton(), 
             ActionEvent.ACTION_PERFORMED, "");
         
-        // Mock JFileChooser to return APPROVE_OPTION
-        // Note: This is a simplified test - in practice, you'd need to handle the file chooser
-        
         controller.actionPerformed(event);
         
-        // Verify export logic (if file chooser approved)
-        // Note: Actual implementation shows file chooser, so this test is limited
+        verify(dialogService, times(1)).chooseExportFile(view, "Recording 1");
+        verify(recordingManager, times(1)).exportToMIDI("Recording 1", exportFile);
+        verify(controlPanel, times(1)).setStatus(contains("Exported:"));
+        verify(dialogService, times(1)).showMessage(eq(view), contains("exported successfully"), eq("Export Success"));
     }
     
     @Test
-    void testRenameRecording() {
+    void testExportRecording_UserCancels() {
+        when(recordingPanel.getSelectedRecording()).thenReturn("Recording 1");
+        when(dialogService.chooseExportFile(view, "Recording 1")).thenReturn(null);
+        
+        ActionEvent event = new ActionEvent(recordingPanel.getExportButton(), 
+            ActionEvent.ACTION_PERFORMED, "");
+        
+        controller.actionPerformed(event);
+        
+        verify(dialogService, times(1)).chooseExportFile(view, "Recording 1");
+        verify(recordingManager, never()).exportToMIDI(anyString(), any(File.class));
+    }
+    
+    @Test
+    void testExportRecording_ExportFails() throws java.io.IOException {
+        when(recordingPanel.getSelectedRecording()).thenReturn("Recording 1");
+        File exportFile = new File("test.mid");
+        when(dialogService.chooseExportFile(view, "Recording 1")).thenReturn(exportFile);
+        doThrow(new java.io.IOException("Export failed")).when(recordingManager).exportToMIDI("Recording 1", exportFile);
+        
+        ActionEvent event = new ActionEvent(recordingPanel.getExportButton(), 
+            ActionEvent.ACTION_PERFORMED, "");
+        
+        controller.actionPerformed(event);
+        
+        verify(recordingManager, times(1)).exportToMIDI("Recording 1", exportFile);
+        verify(dialogService, times(1)).showError(eq(view), contains("Failed to export"), eq("Export Error"));
+    }
+    
+    @Test
+    void testRenameRecording_UserProvidesNewName() {
         when(recordingPanel.getSelectedRecording()).thenReturn("Old Name");
+        when(dialogService.promptRename(view, "Old Name")).thenReturn("New Name");
         when(recordingManager.renameRecording("Old Name", "New Name")).thenReturn(true);
         when(recordingManager.listRecordings()).thenReturn(Arrays.asList("New Name"));
         
         ActionEvent event = new ActionEvent(recordingPanel.getRenameButton(), 
             ActionEvent.ACTION_PERFORMED, "");
         
-        // Mock JOptionPane.showInputDialog to return "New Name"
-        // Note: This is a simplified test - in practice, you'd need to handle the dialog
+        controller.actionPerformed(event);
+        
+        verify(dialogService, times(1)).promptRename(view, "Old Name");
+        verify(recordingManager, times(1)).renameRecording("Old Name", "New Name");
+        verify(controlPanel, times(1)).setStatus("Renamed to: New Name");
+        verify(recordingPanel, times(1)).updateRecordings(anyList());
+    }
+    
+    @Test
+    void testRenameRecording_UserCancels() {
+        when(recordingPanel.getSelectedRecording()).thenReturn("Old Name");
+        when(dialogService.promptRename(view, "Old Name")).thenReturn(null);
+        
+        ActionEvent event = new ActionEvent(recordingPanel.getRenameButton(), 
+            ActionEvent.ACTION_PERFORMED, "");
         
         controller.actionPerformed(event);
         
-        // Verify rename logic (if user provided new name)
-        // Note: Actual implementation shows input dialog, so this test is limited
+        verify(dialogService, times(1)).promptRename(view, "Old Name");
+        verify(recordingManager, never()).renameRecording(anyString(), anyString());
+    }
+    
+    @Test
+    void testRenameRecording_UserProvidesEmptyName() {
+        when(recordingPanel.getSelectedRecording()).thenReturn("Old Name");
+        when(dialogService.promptRename(view, "Old Name")).thenReturn("   "); // Whitespace only
+        
+        ActionEvent event = new ActionEvent(recordingPanel.getRenameButton(), 
+            ActionEvent.ACTION_PERFORMED, "");
+        
+        controller.actionPerformed(event);
+        
+        verify(dialogService, times(1)).promptRename(view, "Old Name");
+        verify(recordingManager, never()).renameRecording(anyString(), anyString());
+    }
+    
+    @Test
+    void testRenameRecording_UserProvidesSameName() {
+        when(recordingPanel.getSelectedRecording()).thenReturn("Old Name");
+        when(dialogService.promptRename(view, "Old Name")).thenReturn("Old Name");
+        
+        ActionEvent event = new ActionEvent(recordingPanel.getRenameButton(), 
+            ActionEvent.ACTION_PERFORMED, "");
+        
+        controller.actionPerformed(event);
+        
+        verify(dialogService, times(1)).promptRename(view, "Old Name");
+        verify(recordingManager, never()).renameRecording(anyString(), anyString());
+    }
+    
+    @Test
+    void testRenameRecording_RenameFails() {
+        when(recordingPanel.getSelectedRecording()).thenReturn("Old Name");
+        when(dialogService.promptRename(view, "Old Name")).thenReturn("New Name");
+        when(recordingManager.renameRecording("Old Name", "New Name"))
+            .thenThrow(new IllegalArgumentException("Name already exists"));
+        
+        ActionEvent event = new ActionEvent(recordingPanel.getRenameButton(), 
+            ActionEvent.ACTION_PERFORMED, "");
+        
+        controller.actionPerformed(event);
+        
+        verify(recordingManager, times(1)).renameRecording("Old Name", "New Name");
+        verify(dialogService, times(1)).showError(eq(view), contains("Cannot rename"), eq("Rename Error"));
     }
     
     @Test
@@ -141,4 +247,3 @@ class RecordingPanelControllerTest {
         verify(recordingPanel, times(1)).updateRecordings(anyList());
     }
 }
-

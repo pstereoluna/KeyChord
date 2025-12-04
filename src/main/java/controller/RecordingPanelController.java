@@ -17,16 +17,19 @@ import java.io.File;
 public class RecordingPanelController implements ActionListener {
     private final PianoModel model;
     private final PianoView view;
+    private final DialogService dialogService;
     
     /**
      * Creates a new RecordingPanelController.
      * 
      * @param model the PianoModel
      * @param view the PianoView
+     * @param dialogService the dialog service for user interactions
      */
-    public RecordingPanelController(PianoModel model, PianoView view) {
+    public RecordingPanelController(PianoModel model, PianoView view, DialogService dialogService) {
         this.model = model;
         this.view = view;
+        this.dialogService = dialogService;
         
         // Wire up button listeners
         view.getRecordingPanel().addPlayListener(this);
@@ -42,10 +45,9 @@ public class RecordingPanelController implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String selectedName = view.getRecordingPanel().getSelectedRecording();
         if (selectedName == null) {
-            JOptionPane.showMessageDialog(view,
+            dialogService.showMessage(view,
                 "Please select a recording first.",
-                "No Selection",
-                JOptionPane.INFORMATION_MESSAGE);
+                "No Selection");
             return;
         }
         
@@ -99,12 +101,7 @@ public class RecordingPanelController implements ActionListener {
      * @param recordingName the name of the recording to delete
      */
     private void deleteRecording(String recordingName) {
-        int confirm = JOptionPane.showConfirmDialog(view,
-            "Are you sure you want to delete '" + recordingName + "'?",
-            "Confirm Delete",
-            JOptionPane.YES_NO_OPTION);
-        
-        if (confirm == JOptionPane.YES_OPTION) {
+        if (dialogService.confirmDelete(view, recordingName)) {
             boolean deleted = model.getRecordingManager().deleteRecording(recordingName);
             if (deleted) {
                 updateRecordingList();
@@ -121,38 +118,21 @@ public class RecordingPanelController implements ActionListener {
      * @param recordingName the name of the recording to export
      */
     private void exportRecording(String recordingName) {
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Export Recording to MIDI");
-        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter(
-            "MIDI Files (*.mid)", "mid"));
-        fileChooser.setSelectedFile(new File(recordingName + ".mid"));
-        
-        int result = fileChooser.showSaveDialog(view);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            // Ensure .mid extension
-            final File file;
-            if (!selectedFile.getName().toLowerCase().endsWith(".mid")) {
-                file = new File(selectedFile.getParent(), selectedFile.getName() + ".mid");
-            } else {
-                file = selectedFile;
-            }
-            
+        File file = dialogService.chooseExportFile(view, recordingName);
+        if (file != null) {
             try {
                 model.getRecordingManager().exportToMIDI(recordingName, file);
                 SwingUtilities.invokeLater(() -> {
                     view.getControlPanel().setStatus("Exported: " + file.getName());
-                    JOptionPane.showMessageDialog(view,
+                    dialogService.showMessage(view,
                         "Recording exported successfully to:\n" + file.getAbsolutePath(),
-                        "Export Success",
-                        JOptionPane.INFORMATION_MESSAGE);
+                        "Export Success");
                 });
             } catch (Exception e) {
                 SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(view,
+                    dialogService.showError(view,
                         "Failed to export recording: " + e.getMessage(),
-                        "Export Error",
-                        JOptionPane.ERROR_MESSAGE);
+                        "Export Error");
                 });
             }
         }
@@ -164,10 +144,7 @@ public class RecordingPanelController implements ActionListener {
      * @param oldName the current name of the recording
      */
     private void renameRecording(String oldName) {
-        String newName = JOptionPane.showInputDialog(view,
-            "Enter new name for recording:",
-            "Rename Recording",
-            JOptionPane.QUESTION_MESSAGE);
+        String newName = dialogService.promptRename(view, oldName);
         
         if (newName != null && !newName.trim().isEmpty() && !newName.trim().equals(oldName)) {
             try {
@@ -180,10 +157,9 @@ public class RecordingPanelController implements ActionListener {
                 }
             } catch (IllegalArgumentException e) {
                 SwingUtilities.invokeLater(() -> {
-                    JOptionPane.showMessageDialog(view,
+                    dialogService.showError(view,
                         "Cannot rename: " + e.getMessage(),
-                        "Rename Error",
-                        JOptionPane.ERROR_MESSAGE);
+                        "Rename Error");
                 });
             }
         }
