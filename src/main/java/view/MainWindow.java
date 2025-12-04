@@ -83,14 +83,96 @@ public class MainWindow extends JFrame {
             }
         });
         
+        // Add listener to chord selector to return focus after selection
+        JComboBox<?> chordSelector = pianoView.getControlPanel().getChordSelector();
+        chordSelector.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            @Override
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent e) {
+                // Popup opening - do nothing
+            }
+            
+            @Override
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent e) {
+                // Popup closing (selection made or cancelled) - return focus to keyboard
+                SwingUtilities.invokeLater(() -> {
+                    pianoView.getKeyboardPanel().requestFocusInWindow();
+                });
+            }
+            
+            @Override
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent e) {
+                // Popup cancelled - return focus to keyboard
+                SwingUtilities.invokeLater(() -> {
+                    pianoView.getKeyboardPanel().requestFocusInWindow();
+                });
+            }
+        });
+        
+        // Add focus listener to control panel buttons to return focus after click
+        for (Component comp : pianoView.getControlPanel().getComponents()) {
+            if (comp instanceof JButton) {
+                ((JButton) comp).addActionListener(e -> {
+                    SwingUtilities.invokeLater(() -> {
+                        pianoView.getKeyboardPanel().requestFocusInWindow();
+                    });
+                });
+            }
+        }
+        
+        // Add focus listener to recording panel buttons to return focus after click
+        pianoView.getRecordingPanel().getPlayButton().addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> pianoView.getKeyboardPanel().requestFocusInWindow());
+        });
+        pianoView.getRecordingPanel().getDeleteButton().addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> pianoView.getKeyboardPanel().requestFocusInWindow());
+        });
+        pianoView.getRecordingPanel().getExportButton().addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> pianoView.getKeyboardPanel().requestFocusInWindow());
+        });
+        pianoView.getRecordingPanel().getRenameButton().addActionListener(e -> {
+            SwingUtilities.invokeLater(() -> pianoView.getKeyboardPanel().requestFocusInWindow());
+        });
+        
         // Add focus listener to keyboard panel to keep it focused
         pianoView.getKeyboardPanel().addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusLost(java.awt.event.FocusEvent e) {
-                // If focus is lost to another component in our window, try to get it back
-                if (e.getOppositeComponent() == null || 
-                    SwingUtilities.isDescendingFrom(e.getOppositeComponent(), MainWindow.this)) {
+                Component opposite = e.getOppositeComponent();
+                
+                // Don't steal focus from control panel components (buttons, dropdowns, etc.)
+                // This allows users to interact with the control panel without focus being stolen
+                if (opposite != null) {
+                    // Check if focus went to control panel or recording panel
+                    if (SwingUtilities.isDescendingFrom(opposite, pianoView.getControlPanel()) ||
+                        SwingUtilities.isDescendingFrom(opposite, pianoView.getRecordingPanel())) {
+                        return; // Let the control/recording panel keep focus
+                    }
+                    
+                    // Check if focus went to a JComboBox popup (which is a separate window)
+                    if (opposite instanceof JComponent) {
+                        // JComboBox popups are often in a separate lightweight popup
+                        Container parent = opposite.getParent();
+                        while (parent != null) {
+                            if (parent instanceof JPopupMenu || 
+                                parent.getClass().getName().contains("Popup")) {
+                                return; // Let the popup keep focus
+                            }
+                            parent = parent.getParent();
+                        }
+                    }
+                }
+                
+                // For other cases within our window, reclaim focus for keyboard input
+                if (opposite == null || 
+                    SwingUtilities.isDescendingFrom(opposite, MainWindow.this)) {
                     SwingUtilities.invokeLater(() -> {
+                        // Double-check that focus isn't on a control panel component
+                        Component currentFocus = KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner();
+                        if (currentFocus != null && 
+                            (SwingUtilities.isDescendingFrom(currentFocus, pianoView.getControlPanel()) ||
+                             SwingUtilities.isDescendingFrom(currentFocus, pianoView.getRecordingPanel()))) {
+                            return;
+                        }
                         pianoView.getKeyboardPanel().requestFocusInWindow();
                     });
                 }
@@ -98,4 +180,3 @@ public class MainWindow extends JFrame {
         });
     }
 }
-
