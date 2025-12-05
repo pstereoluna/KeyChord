@@ -20,8 +20,6 @@ import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for RecordingController.
- * Tests recording start/stop functionality.
- * Updated for RecordingManager architecture.
  */
 class RecordingControllerTest {
     @Mock
@@ -40,6 +38,9 @@ class RecordingControllerTest {
     private javax.swing.JButton recordButton;
     
     @Mock
+    private view.PianoKeyboardPanel keyboardPanel;
+    
+    @Mock
     private RecordingPanel recordingPanel;
     
     @Mock
@@ -53,19 +54,29 @@ class RecordingControllerTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
+        
+        // 设置 view 层级
         when(view.getPianoView()).thenReturn(pianoView);
         when(pianoView.getControlPanel()).thenReturn(controlPanel);
         when(pianoView.getRecordingPanel()).thenReturn(recordingPanel);
+        when(pianoView.getKeyboardPanel()).thenReturn(keyboardPanel);
         when(controlPanel.getRecordButton()).thenReturn(recordButton);
-        when(model.isRecording()).thenReturn(false);
-        when(model.getRecordingManager()).thenReturn(recordingManager);
-        when(recordingManager.listRecordings()).thenReturn(Arrays.asList());
+        
+        // 设置 model - 使用 lenient 避免冲突
+        lenient().when(model.isRecording()).thenReturn(false);
+        lenient().when(model.getRecordingManager()).thenReturn(recordingManager);
+        lenient().when(recordingManager.listRecordings()).thenReturn(Arrays.asList());
         
         controller = new RecordingController(model, view);
     }
     
     @Test
     void testKeyPressedSpaceStartsRecording() {
+        // 重置 mock 以确保干净状态
+        reset(model);
+        when(model.isRecording()).thenReturn(false);
+        when(model.getRecordingManager()).thenReturn(recordingManager);
+        
         KeyEvent keyEvent = new KeyEvent(
             mock(Component.class),
             KeyEvent.KEY_PRESSED,
@@ -75,8 +86,6 @@ class RecordingControllerTest {
             ' '
         );
         
-        when(model.isRecording()).thenReturn(false);
-        
         controller.keyPressed(keyEvent);
         
         verify(model, times(1)).startRecording();
@@ -84,7 +93,10 @@ class RecordingControllerTest {
     
     @Test
     void testKeyPressedEnterStopsRecording() {
+        // 重置 mock 以确保干净状态
+        reset(model);
         when(model.isRecording()).thenReturn(true);
+        when(model.getRecordingManager()).thenReturn(recordingManager);
         when(model.stopRecording()).thenReturn(recording);
         when(recording.getName()).thenReturn("Recording 1");
         when(recordingManager.listRecordings()).thenReturn(Arrays.asList("Recording 1"));
@@ -105,7 +117,9 @@ class RecordingControllerTest {
     
     @Test
     void testButtonActionStartsRecording() {
+        reset(model);
         when(model.isRecording()).thenReturn(false);
+        when(model.getRecordingManager()).thenReturn(recordingManager);
         
         ActionEvent actionEvent = new ActionEvent(recordButton, ActionEvent.ACTION_PERFORMED, "");
         controller.actionPerformed(actionEvent);
@@ -115,7 +129,9 @@ class RecordingControllerTest {
     
     @Test
     void testButtonActionStopsRecording() {
+        reset(model);
         when(model.isRecording()).thenReturn(true);
+        when(model.getRecordingManager()).thenReturn(recordingManager);
         when(model.stopRecording()).thenReturn(recording);
         when(recording.getName()).thenReturn("Recording 1");
         when(recordingManager.listRecordings()).thenReturn(Arrays.asList("Recording 1"));
@@ -128,7 +144,9 @@ class RecordingControllerTest {
     
     @Test
     void testStopRecordingUpdatesPanel() {
+        reset(model);
         when(model.isRecording()).thenReturn(true);
+        when(model.getRecordingManager()).thenReturn(recordingManager);
         when(model.stopRecording()).thenReturn(recording);
         when(recording.getName()).thenReturn("Recording 1");
         when(recordingManager.listRecordings()).thenReturn(Arrays.asList("Recording 1"));
@@ -144,7 +162,7 @@ class RecordingControllerTest {
         
         controller.keyPressed(keyEvent);
         
-        // Verify that recording panel was updated
-        verify(recordingPanel, atLeastOnce()).updateRecordings(anyList());
+        // 异步调用，使用 timeout
+        verify(recordingPanel, timeout(500).atLeastOnce()).updateRecordings(anyList());
     }
 }

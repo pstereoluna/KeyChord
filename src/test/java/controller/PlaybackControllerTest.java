@@ -17,6 +17,7 @@ import java.awt.Component;
 import java.util.Arrays;
 
 import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
 
 /**
  * Unit tests for PlaybackController.
@@ -89,8 +90,8 @@ class PlaybackControllerTest {
         
         controller.keyPressed(keyEvent);
         
-        // Verify that startPlayback was called with recording name
-        verify(model, atLeastOnce()).startPlayback(anyString());
+        // ✅ 修复：源码调用的是 startPlaybackWithHandler，不是 startPlayback
+        verify(model, atLeastOnce()).startPlaybackWithHandler(any(), any());
     }
     
     @Test
@@ -121,8 +122,7 @@ class PlaybackControllerTest {
         ActionEvent actionEvent = new ActionEvent(playButton, ActionEvent.ACTION_PERFORMED, "");
         controller.actionPerformed(actionEvent);
         
-        // Should call startPlayback with selected recording
-        verify(model, atLeastOnce()).startPlayback(anyString());
+        verify(model, atLeastOnce()).startPlaybackWithHandler(any(), any());
     }
     
     @Test

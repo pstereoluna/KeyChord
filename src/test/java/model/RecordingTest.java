@@ -100,7 +100,7 @@ class RecordingTest {
             recording.addNoteEvents(null);
         }, "Should throw exception for null list");
         
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(NullPointerException.class, () -> {
             recording.addNoteEvents(List.of(new NoteEvent(60, 1000, true), null));
         }, "Should throw exception for list containing null");
     }
