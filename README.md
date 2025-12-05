@@ -67,11 +67,18 @@ java -jar target/KeyChord-1.0-SNAPSHOT.jar
 
 ### Playing Notes
 - **Mouse**: Click on keys to play
+- **Keyboard**: Use QWERTY keyboard mapping
+  - **Lower octave (C3-C4)**: 
+    - White keys: `q`, `w`, `e`, `r`, `t`, `y`, `u`, `i`
+    - Black keys: `2`, `3`, `5`, `6`, `7`
+  - **Upper octave (C4-C5)**:
+    - White keys: `c`, `v`, `b`, `n`, `m`, `,`, `.`, `/`
+    - Black keys: `f`, `g`, `j`, `k`, `l`
 
 ### Recording
-1. Click **Record** button to start recording
+1. Press **Space** or click **Record** button to start recording
 2. Play notes/chords
-3. Click **Record** again to stop
+3. Press **Enter** or click **Record** again to stop
 4. Recording is auto-saved with default name
 
 ### Playing Recordings

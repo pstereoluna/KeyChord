@@ -661,12 +661,7 @@
 
 ### Better Testing Strategy
 
-1. **Integration Tests**
-   - Add tests for full recording → playback cycle
-   - Test MIDI export/import
-   - Test concurrent recording and playback
-
-2. **UI Tests**
+1. **UI Tests**
    - Add tests for keyboard layout rendering
    - Test key highlighting
    - Test button interactions
