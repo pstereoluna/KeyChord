@@ -32,6 +32,9 @@ public class PianoModel {
     private final ChordManager chordManager;
     private final RecordingManager recordingManager;
     
+    // Track when recording was last stopped to prevent accidental playback trigger
+    private volatile long lastRecordingStopTime = 0;
+    
     /**
      * Creates a new PianoModel and initializes all components.
      * 
@@ -78,7 +81,10 @@ public class PianoModel {
      */
     public Recording stopRecording() {
         recorder.stopRecording();
-        return recordingManager.stopRecording();
+        Recording saved = recordingManager.stopRecording();
+        // Record the time when recording stopped to prevent accidental playback trigger
+        lastRecordingStopTime = System.currentTimeMillis();
+        return saved;
     }
     
     /**
@@ -89,7 +95,20 @@ public class PianoModel {
      */
     public Recording stopRecording(String name) {
         recorder.stopRecording();
-        return recordingManager.stopRecording(name);
+        Recording saved = recordingManager.stopRecording(name);
+        // Record the time when recording stopped to prevent accidental playback trigger
+        lastRecordingStopTime = System.currentTimeMillis();
+        return saved;
+    }
+    
+    /**
+     * Gets the timestamp when recording was last stopped.
+     * Used to prevent accidental playback trigger immediately after stopping recording.
+     * 
+     * @return the timestamp in milliseconds, or 0 if recording has never been stopped
+     */
+    public long getLastRecordingStopTime() {
+        return lastRecordingStopTime;
     }
     
     /**

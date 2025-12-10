@@ -48,6 +48,15 @@ public class PlaybackController implements KeyListener, ActionListener {
         // Enter key: Toggle playback (only if not recording)
         // Note: If recording, RecordingController handles Enter to stop recording
         if (keyCode == KeyEvent.VK_ENTER && !model.isRecording()) {
+            // Prevent accidental playback immediately after stopping recording
+            // Check if recording was stopped within the last 200ms
+            long lastStopTime = model.getLastRecordingStopTime();
+            long timeSinceStop = System.currentTimeMillis() - lastStopTime;
+            if (lastStopTime > 0 && timeSinceStop < 200) {
+                // Recording was just stopped, ignore this Enter key press
+                return;
+            }
+            
             if (!model.isPlaying()) {
                 startPlayback();
             } else {
