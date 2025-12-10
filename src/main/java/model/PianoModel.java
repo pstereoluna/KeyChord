@@ -8,6 +8,21 @@ import java.util.List;
  * Manages tracks, recording, playback, MIDI sound, and chord generation.
  * Follows MVC pattern - no UI dependencies.
  * 
+ * <p><b>Design Principles Applied:</b></p>
+ * <ul>
+ *   <li><b>Single Responsibility Principle (SRP):</b> Each component (Recorder, Player,
+ *       MidiSoundManager, ChordManager, RecordingManager) has a single, well-defined responsibility.
+ *       PianoModel coordinates these components but delegates specific tasks to them.</li>
+ *   <li><b>Composition over Inheritance:</b> PianoModel composes multiple specialized components
+ *       (Recorder, Player, MidiSoundManager, etc.) rather than inheriting from a base class.
+ *       This provides flexibility and follows the "has-a" relationship pattern.</li>
+ *   <li><b>Adapter Pattern:</b> RecordingEventSource inner class adapts Recording to Player's
+ *       EventSource interface, allowing Player to work with Recordings without modifying either
+ *       class. This demonstrates the Adapter pattern for interface compatibility.</li>
+ *   <li><b>MVC Pattern:</b> This class is part of the Model layer, containing no UI dependencies
+ *       and providing a clean interface for Controllers to interact with.</li>
+ * </ul>
+ * 
  * @author KeyChord
  */
 public class PianoModel {
@@ -250,6 +265,9 @@ public class PianoModel {
     
     /**
      * Adapter class to convert Recording to Player.EventSource interface.
+     * 
+     * <p><b>Design Principle: Adapter Pattern</b> - Adapts Recording to Player.EventSource
+     * interface, allowing Player to work with Recordings without modifying either class.
      */
     private static class RecordingEventSource implements Player.EventSource {
         private final Recording recording;

@@ -7,6 +7,15 @@ import java.awt.*;
  * Main application window for KeyChord.
  * Sets up the main frame and initializes the piano view.
  * 
+ * <p><b>Design Principles Applied:</b></p>
+ * <ul>
+ *   <li><b>MVC Pattern:</b> This class is part of the View layer in the MVC architecture.
+ *       It handles window setup, layout, and focus management. It contains no business logic
+ *       and delegates all model interactions to Controllers.</li>
+ *   <li><b>Separation of Concerns:</b> The view is responsible only for UI presentation and
+ *       user interaction. It does not contain business logic or direct model access.</li>
+ * </ul>
+ * 
  * @author KeyChord
  */
 public class MainWindow extends JFrame {

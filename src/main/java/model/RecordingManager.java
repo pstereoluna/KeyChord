@@ -10,6 +10,21 @@ import java.util.concurrent.ConcurrentHashMap;
  * Manages multiple recordings with save, delete, and export functionality.
  * Thread-safe for concurrent operations.
  * 
+ * <p><b>Design Principles Applied:</b></p>
+ * <ul>
+ *   <li><b>Thread Safety:</b> Uses synchronized blocks and ConcurrentHashMap to ensure
+ *       thread-safe access to shared state. All operations on recordings map are protected
+ *       by synchronization to prevent race conditions.</li>
+ *   <li><b>Encapsulation:</b> Uses ConcurrentHashMap internally to store recordings, providing
+ *       controlled access through public methods. The listRecordings() method returns an
+ *       unmodifiable list to prevent external modification.</li>
+ *   <li><b>Input Validation:</b> Validates recording names (null/empty checks) and file
+ *       parameters before operations, throwing IllegalArgumentException with clear messages
+ *       for invalid inputs.</li>
+ *   <li><b>Defensive Programming:</b> Checks for null recordings and handles edge cases
+ *       (e.g., renaming to same name, exporting non-existent recordings) gracefully.</li>
+ * </ul>
+ * 
  * @author KeyChord
  */
 public class RecordingManager {
@@ -103,6 +118,7 @@ public class RecordingManager {
      * @throws IllegalArgumentException if name or recording is null
      */
     public void saveRecording(String name, Recording recording) {
+        // Design Principle: Input Validation - validate parameters before operations
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Recording name cannot be null or empty");
         }
@@ -151,6 +167,7 @@ public class RecordingManager {
      * @return a list of recording names, sorted with natural ordering for "Recording X" format
      */
     public List<String> listRecordings() {
+        // Design Principle: Thread Safety - synchronized access to shared state
         synchronized (lock) {
             List<String> names = new ArrayList<>(recordings.keySet());
             // Sort with natural ordering: "Recording X" format sorted by number, others alphabetically
@@ -173,6 +190,7 @@ public class RecordingManager {
                     return name1.compareTo(name2);
                 }
             });
+            // Design Principle: Encapsulation - return unmodifiable list to prevent external modification
             return Collections.unmodifiableList(names);
         }
     }
@@ -204,6 +222,7 @@ public class RecordingManager {
      * @throws IllegalArgumentException if recording not found or file is null
      */
     public void exportToMIDI(String name, File file) throws IOException {
+        // Design Principle: Input Validation - validate all parameters before processing
         if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Recording name cannot be null or empty");
         }

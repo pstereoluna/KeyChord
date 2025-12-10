@@ -7,6 +7,15 @@ import java.util.List;
  * Records NoteEvents with timestamps.
  * Thread-safe for concurrent recording operations.
  * 
+ * <p><b>Design Principles Applied:</b></p>
+ * <ul>
+ *   <li><b>Single Responsibility Principle (SRP):</b> This class has a single responsibility:
+ *       recording NoteEvents with timestamps. It does not handle playback, storage, or UI concerns.</li>
+ *   <li><b>Thread Safety:</b> All methods use synchronized blocks to ensure thread-safe access
+ *       to shared state (isRecording flag, startTime). This allows concurrent access from
+ *       multiple threads without race conditions.</li>
+ * </ul>
+ * 
  * @author KeyChord
  */
 public class Recorder {
@@ -26,6 +35,7 @@ public class Recorder {
      * Starts recording. Resets the start time.
      */
     public void startRecording() {
+        // Design Principle: Thread Safety - synchronized access to shared state
         synchronized (lock) {
             isRecording = true;
             startTime = System.currentTimeMillis();

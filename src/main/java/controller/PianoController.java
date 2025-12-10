@@ -16,7 +16,19 @@ import java.util.List;
 /**
  * Main controller for piano key input and chord generation.
  * Handles keyboard events and coordinates between model and view.
- * * @author KeyChord
+ * 
+ * <p><b>Design Principles Applied:</b></p>
+ * <ul>
+ *   <li><b>MVC Pattern:</b> This class is part of the Controller layer in the MVC architecture.
+ *       It handles user input (keyboard and mouse events) and coordinates between the Model
+ *       (PianoModel) and View (PianoView). It contains no business logic, only coordination
+ *       and event handling.</li>
+ *   <li><b>Separation of Concerns:</b> The controller delegates business logic to the model
+ *       (playNote, generateChord) and view updates to the view (highlightKey). It does not
+ *       contain model or view logic itself.</li>
+ * </ul>
+ * 
+ * @author KeyChord
  */
 public class PianoController implements KeyListener, ActionListener {
     private final PianoModel model;

@@ -7,6 +7,21 @@ import javax.sound.midi.*;
  * Uses a singleton pattern with SoftSynthesizer for clean piano sound.
  * Thread-safe for concurrent note operations.
  * 
+ * <p><b>Design Principles Applied:</b></p>
+ * <ul>
+ *   <li><b>Singleton Pattern:</b> Ensures only one instance of MidiSoundManager exists,
+ *       preventing multiple synthesizer instances and resource conflicts. Uses double-checked
+ *       locking for thread-safe lazy initialization.</li>
+ *   <li><b>Resource Management:</b> Provides close() method to properly release MIDI synthesizer
+ *       resources. All notes are stopped before closing to prevent hanging notes.</li>
+ *   <li><b>Thread Safety:</b> All public methods use synchronized blocks to ensure thread-safe
+ *       access to shared state (synthesizer, pianoChannel, initialized flag).</li>
+ *   <li><b>Input Validation:</b> All methods validate MIDI note and velocity parameters,
+ *       throwing IllegalArgumentException with clear error messages for invalid inputs.</li>
+ *   <li><b>Defensive Programming:</b> Checks for null channels and initialization state before
+ *       performing operations to prevent NullPointerException.</li>
+ * </ul>
+ * 
  * @author KeyChord
  */
 public class MidiSoundManager {
@@ -139,6 +154,7 @@ public class MidiSoundManager {
      * @throws IllegalArgumentException if midiNote or velocity is out of range
      */
     public void playNote(int midiNote, int velocity) {
+        // Design Principle: Input Validation - fail fast with clear error message
         if (midiNote < 0 || midiNote > 127) {
             throw new IllegalArgumentException("MIDI note must be between 0 and 127");
         }
@@ -160,6 +176,7 @@ public class MidiSoundManager {
      * @throws IllegalArgumentException if midiNote is out of range
      */
     public void stopNote(int midiNote) {
+        // Design Principle: Input Validation - validate MIDI note range
         if (midiNote < 0 || midiNote > 127) {
             throw new IllegalArgumentException("MIDI note must be between 0 and 127");
         }
@@ -221,9 +238,10 @@ public class MidiSoundManager {
      * Should only be called on application shutdown.
      */
     public void close() {
+        // Design Principle: Resource Management - properly release MIDI resources
         synchronized (lock) {
             if (synthesizer != null && synthesizer.isOpen()) {
-                allNotesOff();
+                allNotesOff(); // Stop all notes before closing
                 synthesizer.close();
                 initialized = false;
             }

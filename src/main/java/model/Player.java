@@ -5,7 +5,20 @@ import java.util.List;
 /**
  * Plays back NoteEvents from an EventSource with proper timing.
  * Handles scheduling of note on/off events for accurate playback.
- * * @author KeyChord
+ * 
+ * <p><b>Design Principles Applied:</b></p>
+ * <ul>
+ *   <li><b>Single Responsibility Principle (SRP):</b> This class has a single responsibility:
+ *       playing back NoteEvents with proper timing. It does not handle recording, storage,
+ *       or UI concerns.</li>
+ *   <li><b>Adapter Pattern:</b> The EventSource interface allows Player to work with different
+ *       event sources (Recordings, etc.) through a common interface. This demonstrates the
+ *       Adapter pattern for interface compatibility.</li>
+ *   <li><b>Input Validation:</b> Validates that EventSource and NotePlaybackHandler are not null
+ *       before starting playback, throwing IllegalArgumentException with clear error messages.</li>
+ * </ul>
+ * 
+ * @author KeyChord
  */
 public class Player {
     private boolean isPlaying;
@@ -49,6 +62,7 @@ public class Player {
      * @throws IllegalArgumentException if source or handler is null
      */
     public void startPlayback(EventSource source, NotePlaybackHandler handler) {
+        // Design Principle: Input Validation - validate parameters before operations
         if (source == null) {
             throw new IllegalArgumentException("EventSource cannot be null");
         }

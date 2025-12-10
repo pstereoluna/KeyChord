@@ -8,6 +8,21 @@ import java.util.List;
  * Supports various chord types with extensible design.
  * Default chord type is a major triad.
  * 
+ * <p><b>Design Principles Applied:</b></p>
+ * <ul>
+ *   <li><b>Open/Closed Principle (OCP):</b> New chord types can be added by extending the
+ *       ChordType enum without modifying existing code. The generateChord method is closed
+ *       for modification but open for extension through new enum values.</li>
+ *   <li><b>Strategy Pattern:</b> Each ChordType enum value encapsulates a different chord
+ *       generation strategy (intervals array). The generateChord method delegates to the
+ *       selected strategy, allowing runtime selection of chord types.</li>
+ *   <li><b>Encapsulation:</b> ChordType.getIntervals() returns a clone of the intervals array,
+ *       protecting internal state from external modification. This ensures immutability of
+ *       chord definitions.</li>
+ *   <li><b>Input Validation:</b> Validates root note range (0-127) and clamps chord notes
+ *       to valid MIDI range, preventing invalid note generation.</li>
+ * </ul>
+ * 
  * @author KeyChord
  */
 public class ChordManager {
@@ -28,10 +43,12 @@ public class ChordManager {
         private final int[] intervals;
         
         ChordType(int[] intervals) {
+            // Design Principle: Encapsulation - clone array to protect internal state
             this.intervals = intervals.clone();
         }
         
         public int[] getIntervals() {
+            // Design Principle: Encapsulation - return clone to prevent external modification
             return intervals.clone();
         }
     }
@@ -74,10 +91,12 @@ public class ChordManager {
      * @throws IllegalArgumentException if rootNote is out of range
      */
     public List<Integer> generateChord(int rootNote, ChordType chordType) {
+        // Design Principle: Input Validation - validate MIDI note range
         if (rootNote < 0 || rootNote > 127) {
             throw new IllegalArgumentException("Root note must be between 0 and 127");
         }
         
+        // Design Principle: Strategy Pattern - delegate to selected chord type strategy
         int[] intervals = chordType.getIntervals();
         List<Integer> chordNotes = new ArrayList<>();
         
