@@ -183,9 +183,6 @@ Contributions are welcome! Please:
 3. Write tests for new features
 4. Submit a pull request
 
-## License
-
-[Add your license here]
 
 ## Credits
 
@@ -195,6 +192,24 @@ Developed as a Java Swing application demonstrating:
 - Thread-safe design
 - Comprehensive unit testing
 - Clean code principles
+
+## References
+
+### Core Technologies
+- [1] Java MIDI API - https://docs.oracle.com/javase/8/docs/api/javax/sound/midi/
+- [2] Java Swing Tutorial - https://docs.oracle.com/javase/tutorial/uiswing/
+- [3] Java Concurrency - https://docs.oracle.com/javase/tutorial/essential/concurrency/
+
+### Testing Frameworks
+- [4] JUnit 5 User Guide - https://junit.org/junit5/docs/current/user-guide/
+- [5] Mockito Framework - https://site.mockito.org/
+
+### Music & MIDI
+- [6] MIDI Specification - https://midi.org/specifications
+- [7] Music Theory (Chord Intervals) - https://www.musictheory.net/lessons/40
+
+### Design Patterns
+- [8] Design Patterns: Elements of Reusable Object-Oriented Software (Gamma et al., 1994)
 
 ## Support
 
