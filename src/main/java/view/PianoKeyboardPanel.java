@@ -63,6 +63,15 @@ public class PianoKeyboardPanel extends JPanel {
         // Force layout update
         revalidate();
         repaint();
+        
+        // Fix black key rendering issue when mouse exits window
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent e) {
+                // Ensure black keys are properly repainted when mouse leaves
+                repaint();
+            }
+        });
     }
     
     /**

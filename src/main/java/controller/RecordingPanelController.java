@@ -1,6 +1,8 @@
 package controller;
 
 import model.PianoModel;
+import model.Recording;
+import model.Player;
 import view.PianoView;
 
 import javax.swing.*;
@@ -75,7 +77,27 @@ public class RecordingPanelController implements ActionListener {
             view.getControlPanel().setPlayingState(true);
         });
         
-        model.startPlayback(recordingName);
+        // Use startPlaybackWithHandler to enable key highlighting during playback
+        Recording recording = model.getRecordingManager().getRecording(recordingName);
+        if (recording != null) {
+            model.startPlaybackWithHandler(recording, new Player.NotePlaybackHandler() {
+                @Override
+                public void onNoteOn(int midiNote) {
+                    model.playNoteWithoutRecording(midiNote);
+                    SwingUtilities.invokeLater(() -> {
+                        view.getKeyboardPanel().highlightKey(midiNote);
+                    });
+                }
+                
+                @Override
+                public void onNoteOff(int midiNote) {
+                    model.stopNoteWithoutRecording(midiNote);
+                    SwingUtilities.invokeLater(() -> {
+                        view.getKeyboardPanel().unhighlightKey(midiNote);
+                    });
+                }
+            });
+        }
         
         // Monitor playback completion
         new Thread(() -> {
@@ -91,8 +113,20 @@ public class RecordingPanelController implements ActionListener {
             SwingUtilities.invokeLater(() -> {
                 view.getControlPanel().setPlayingState(false);
                 view.getControlPanel().setStatus("Ready");
+                // Clear all highlights when playback finishes
+                clearAllHighlights();
             });
         }).start();
+    }
+    
+    /**
+     * Clears all key highlights.
+     */
+    private void clearAllHighlights() {
+        // Clear highlights for all visible keys
+        for (int note = 48; note <= 72; note++) {
+            view.getKeyboardPanel().unhighlightKey(note);
+        }
     }
     
     /**
