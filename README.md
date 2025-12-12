@@ -104,28 +104,41 @@ java -jar target/KeyChord-1.0-SNAPSHOT.jar
 
 ## Architecture
 
-KeyChord follows the **MVC (Model-View-Controller)** architectural pattern:
+KeyChord follows the **MVC (Model-View-Controller)** architectural pattern with clear separation of concerns:
 
 ### Model Layer
-- **PianoModel**: Central coordinator
-- **ChordManager**: Chord generation logic
+- **PianoModel**: Central coordinator, delegates to specialized components
+- **ChordManager**: Chord generation logic (Strategy pattern for chord types)
 - **RecordingManager**: Recording storage and management
 - **Recorder**: Recording state and timestamps
-- **Player**: Playback timing
-- **MidiSoundManager**: Audio output (singleton)
+- **Player**: Playback timing and event scheduling
+- **MidiSoundManager**: Audio output (Singleton pattern)
+- **KeyMappings**: QWERTY keyboard to MIDI note mappings
+- **NoteEvent**: Represents a single note event (on/off with timestamp)
+- **Recording**: Container for named sequences of NoteEvents
 
 ### View Layer
-- **MainWindow**: Main application window
+- **MainWindow**: Main application window, manages focus
 - **PianoView**: Main container panel
-- **PianoKeyboardPanel**: Keyboard display
-- **ControlPanelView**: Control buttons
-- **RecordingPanel**: Recording list
+- **PianoKeyboardPanel**: Keyboard display with 25 keys
+- **PianoKeyView**: Individual piano key component (white/black)
+- **ControlPanelView**: Control buttons and chord mode selector
+- **RecordingPanel**: Recording list with management buttons
 
 ### Controller Layer
-- **PianoController**: Keyboard/mouse input
-- **RecordingController**: Recording control
-- **PlaybackController**: Playback control
-- **RecordingPanelController**: Recording panel interactions
+- **PianoController**: Keyboard/mouse input, chord generation coordination
+- **RecordingController**: Recording start/stop control
+- **PlaybackController**: Playback control with visual synchronization
+- **RecordingPanelController**: Recording panel interactions (play, delete, rename, export)
+- **DialogService**: Interface for UI dialogs (enables dependency injection for testing)
+- **DefaultDialogService**: Default implementation using JOptionPane and JFileChooser
+
+### Design Patterns Applied
+- **MVC Pattern**: Clear separation between Model, View, and Controller
+- **Singleton Pattern**: MidiSoundManager ensures single audio instance
+- **Strategy Pattern**: ChordType enum in ChordManager for different chord types
+- **Adapter Pattern**: RecordingEventSource adapts Recording to Player's EventSource interface
+- **Dependency Injection**: DialogService interface allows testable controllers
 
 
 ## Project Structure
